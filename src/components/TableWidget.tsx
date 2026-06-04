@@ -16,10 +16,10 @@ import { ExpressionEngine } from '../core/expressionEngine'
 export interface TableColumn {
   key: string
   label: string
-  visible?: boolean   // default: true
-  sortable?: boolean  // default: true
-  width?: string      // CSS value: '120px', '10%'
-  render?: string     // expression: '{{row.name | uppercase}}', defaults to raw value
+  visible?: boolean   
+  sortable?: boolean  
+  width?: string      
+  render?: string     
 }
 
 type SortDir = 'asc' | 'desc' | null

@@ -228,8 +228,8 @@ describe('TableWidget — selection', () => {
       />
     )
     const firstRow = screen.getAllByRole('row')[1]
-    fireEvent.click(firstRow) // select
-    fireEvent.click(firstRow) // deselect
+    fireEvent.click(firstRow) 
+    fireEvent.click(firstRow) 
     const calls = onEvent.mock.calls.filter(c => c[0] === 'selectionChange')
     expect(calls.at(-1)?.[1]).toEqual({ selected: [] })
   })
