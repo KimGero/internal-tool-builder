@@ -8,14 +8,14 @@ export function InputWidget({ component, runtime, onEvent }: WidgetProps) {
   const placeholder = String(component.props.placeholder ?? '')
   const inputType   = String(component.props.type ?? 'text')
   const disabled    = Boolean(component.props.disabled)
-  const binding     = String(component.props.binding ?? '')
+  const binding     = String(component.props.binding ?? '')|| `_input_${component.id}` 
 
-  // Drive value from runtime state — keep the input controlled
+
   const value = binding ? String(runtime.state[binding] ?? '') : ''
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value
-    // Coerce to number for numeric inputs, but allow empty string mid-type
+    
     const val = inputType === 'number' && raw !== '' ? Number(raw) : raw
     if (binding) runtime.setState(binding, val)
     onEvent('change', { value: val })

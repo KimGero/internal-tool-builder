@@ -1,12 +1,13 @@
 import type React from 'react'
 import type { ComponentDefinition, AppComponent, Runtime } from '../types'
 import { ButtonWidget, ButtonDefinition } from './ButtonWidget'
-import { InputWidget, InputDefinition } from './InputWidget'
-// Imports added here each day as new widgets are built
+import { InputWidget,  InputDefinition  } from './InputWidget'
+import { TableWidget,  TableDefinition  } from './TableWidget'
 
 export interface WidgetProps {
   component: AppComponent
   runtime: Runtime
+  data?: unknown[]          
   onEvent: (event: string, data?: unknown) => void
 }
 
@@ -17,6 +18,7 @@ export interface RegistryEntry extends ComponentDefinition {
 export const REGISTRY: Record<string, RegistryEntry> = {
   button: { ...ButtonDefinition, Widget: ButtonWidget },
   input:  { ...InputDefinition,  Widget: InputWidget  },
+  table:  { ...TableDefinition,  Widget: TableWidget  },
 }
 
 export const getComponentList = (): RegistryEntry[] => Object.values(REGISTRY)
