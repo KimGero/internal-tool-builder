@@ -1,6 +1,6 @@
 export type Context = Record<string, unknown>
 
-export interface Appcomponent {
+export interface AppComponent {
     id: string
     type: string
     props: Record<string, unknown>
@@ -23,7 +23,7 @@ export interface DataSource {
 export interface App {
     id: string
     name: string
-    components: Appcomponent[]
+    components: AppComponent[]
     dataSources: DataSource[]
     createdAt: number
     updatedAt: number
