@@ -31,6 +31,7 @@ export interface App {
 
 export interface Runtime {
     state: Record<string, unknown>
+    stateVersion: number
     setState: (key: string, value: unknown, persist?: boolean) => void
     evaluate: (expression: string, extra?: Context) => unknown
 }   

@@ -1,4 +1,3 @@
-import { loadConfigFromFile } from 'vite';
 import { eventBus } from './eventBus';
 
 import type { Context } from '../types';
@@ -18,7 +17,7 @@ export class StateManager {
             this.persisted.add(key)
             try {
                 localStorage.setItem(`runtime:${key}`, JSON.stringify(value))
-            } catch {/* storage quota, ignore */}
+            } catch {}
         }
     }
 
@@ -61,6 +60,11 @@ export class StateManager {
         this.persisted.clear()
     }
 
+    get stateRef(): Record<string, unknown> {
+    return this.state
+    }
+
 }
 
 export const stateManager = new StateManager()
+export const runtimeState = stateManager 

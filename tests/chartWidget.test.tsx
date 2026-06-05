@@ -4,36 +4,26 @@ import { render, screen } from '@testing-library/react'
 import { ChartWidget } from '../src/components/ChartWidget'
 import type { AppComponent, Runtime } from '../src/types'
 
-// ─────────────────────────────────────────────
-// Recharts mock
-// ResponsiveContainer queries the DOM for dimensions which jsdom
-// cannot provide, so it renders nothing. Replace it with a plain
-// fixed-size wrapper so the inner chart elements are always mounted.
-// ─────────────────────────────────────────────
+
 
 vi.mock('recharts', async () => {
   const actual = await vi.importActual<typeof import('recharts')>('recharts')
   return {
     ...actual,
 
-    // Recharts reads DOM dimensions via getBoundingClientRect / ResizeObserver.
-    // jsdom returns zeros for both, so any component that gates rendering on
-    // non-zero dimensions will produce nothing.  Replace every layout-sensitive
-    // piece with a minimal stub that renders unconditionally.
+  
 
     ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
       <div style={{ width: 500, height: 300 }}>{children}</div>
     ),
 
-    // Chart containers — preserve the .recharts-wrapper class so existing
-    // assertions keep working, and pass children through so series render.
+    
     BarChart:  ({ children }: { children: React.ReactNode }) => <div className="recharts-wrapper" data-testid="bar-chart">{children}</div>,
     LineChart: ({ children }: { children: React.ReactNode }) => <div className="recharts-wrapper" data-testid="line-chart">{children}</div>,
     AreaChart: ({ children }: { children: React.ReactNode }) => <div className="recharts-wrapper" data-testid="area-chart">{children}</div>,
     PieChart:  ({ children }: { children: React.ReactNode }) => <div className="recharts-wrapper" data-testid="pie-chart">{children}</div>,
 
-    // Series primitives — each renders a queryable element tagged with its
-    // dataKey so tests can count and inspect series without depending on SVG.
+    
     Bar:  ({ dataKey }: { dataKey: string }) => <div data-testid="series" data-key={dataKey} />,
     Line: ({ dataKey }: { dataKey: string }) => <div data-testid="series" data-key={dataKey} />,
     Area: ({ dataKey }: { dataKey: string }) => <div data-testid="series" data-key={dataKey} />,
@@ -41,7 +31,7 @@ vi.mock('recharts', async () => {
       <div data-testid="series" data-key={dataKey}>{children}</div>
     ),
 
-    // Decorators — safe no-ops in jsdom
+   
     XAxis:         () => null,
     YAxis:         () => null,
     CartesianGrid: () => null,
@@ -51,7 +41,7 @@ vi.mock('recharts', async () => {
   }
 })
 
-// recharts uses ResizeObserver — must mock before rendering
+
 beforeAll(() => {
   globalThis.ResizeObserver = class {
     observe()    {}
@@ -60,13 +50,11 @@ beforeAll(() => {
   }
 })
 
-// ─────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────
 
 function makeRuntime(state: Record<string, unknown> = {}): Runtime {
   return {
     state,
+    stateVersion: 0,
     setState: vi.fn(),
     evaluate: vi.fn((expr: string) => expr),
   }
@@ -96,9 +84,7 @@ const SAMPLE_DATA = [
   { name: 'Mar', revenue: 5000, costs: 3200 },
 ]
 
-// ─────────────────────────────────────────────
-// Tests
-// ─────────────────────────────────────────────
+
 
 describe('ChartWidget — empty state', () => {
   it('shows the empty state when no data is provided', () => {
@@ -173,8 +159,7 @@ describe('ChartWidget — chart types smoke tests', () => {
 
 describe('ChartWidget — series auto-detection', () => {
   it('auto-detects numeric keys when series prop is empty', () => {
-    // With series: [], the chart should detect 'revenue' and 'costs'
-    // and render a series element for each
+    
     render(
       <ChartWidget
         component={makeComponent({ series: [] })}
@@ -198,7 +183,7 @@ describe('ChartWidget — series auto-detection', () => {
         onEvent={vi.fn()}
       />
     )
-    // Only one series → only one series element
+    
     expect(screen.getAllByTestId('series').length).toBe(1)
   })
 })

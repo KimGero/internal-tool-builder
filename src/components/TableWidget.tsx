@@ -58,7 +58,7 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
     if (!expr) return []
     const raw = ExpressionEngine.evaluateRaw(expr, runtime.state)
     return Array.isArray(raw) ? (raw as Record<string, unknown>[]) : []
-  }, [canvasData, component.props.data, runtime.state])
+  }, [canvasData, component.props.data, runtime.stateVersion])
 
   const [page,     setPage]     = React.useState(1)
   const [search,   setSearch]   = React.useState('')

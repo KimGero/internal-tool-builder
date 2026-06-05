@@ -12,7 +12,7 @@ import type { AppComponent, Runtime } from '../src/types'
 
 
 function makeRuntime(state: Record<string, unknown> = {}): Runtime {
-  return { state, setState: vi.fn(), evaluate: vi.fn((e: string) => e) }
+  return { state,  stateVersion: 0,  setState: vi.fn(), evaluate: vi.fn((e: string) => e) }
 }
 
 function makeComponent(overrides: Partial<AppComponent['props']> = {}): AppComponent {
@@ -89,7 +89,7 @@ describe('buildGrid', () => {
   })
 
   it('first cell is a Monday when weekStart is 1', () => {
-    // January 2025 Monday-start: first cell = Dec 29 2024 (Monday, day 1)
+  
     const grid = buildGrid(2025, 0, 1)
     expect(grid[0].date.getDay()).toBe(1)
   })
@@ -111,7 +111,7 @@ describe('buildGrid', () => {
 })
 
 
-describe('DatePickerWidget — rendering', () => {
+describe('DatePickerWidget Ã¢â‚¬â€ rendering', () => {
   it('renders the label', () => {
     render(<DatePickerWidget component={makeComponent()} runtime={makeRuntime()} onEvent={vi.fn()} />)
     expect(screen.getByText('Select Date')).toBeInTheDocument()
@@ -139,7 +139,7 @@ describe('DatePickerWidget — rendering', () => {
   })
 })
 
-describe('DatePickerWidget — open / close', () => {
+describe('DatePickerWidget Ã¢â‚¬â€ open / close', () => {
   it('opens the calendar on trigger click', () => {
     render(<DatePickerWidget component={makeComponent()} runtime={makeRuntime()} onEvent={vi.fn()} />)
     openCalendar()
@@ -172,7 +172,7 @@ describe('DatePickerWidget — open / close', () => {
   })
 })
 
-describe('DatePickerWidget — selection', () => {
+describe('DatePickerWidget Ã¢â‚¬â€ selection', () => {
   it('calls runtime.setState with a YYYY-MM-DD string', () => {
     const runtime = makeRuntime()
     render(<DatePickerWidget component={makeComponent()} runtime={runtime} onEvent={vi.fn()} />)
@@ -209,7 +209,7 @@ describe('DatePickerWidget — selection', () => {
   })
 })
 
-describe('DatePickerWidget — clear', () => {
+describe('DatePickerWidget Ã¢â‚¬â€ clear', () => {
   it('shows clear button when a date is selected', () => {
     render(
       <DatePickerWidget
@@ -253,7 +253,7 @@ describe('DatePickerWidget — clear', () => {
   })
 })
 
-describe('DatePickerWidget — min/max', () => {
+describe('DatePickerWidget Ã¢â‚¬â€ min/max', () => {
   it('disables the Today button when today is before minDate', () => {
     render(
       <DatePickerWidget

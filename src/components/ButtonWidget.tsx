@@ -1,31 +1,43 @@
-import React from 'react'
-import { Loader2 } from 'lucide-react'
-import { clsx } from 'clsx'
-import type { ComponentDefinition } from '../types'
-import type { WidgetProps } from './registry'
+import React from 'react';
+import { Loader2 } from 'lucide-react';
+import { clsx } from 'clsx';
+import type { ComponentDefinition } from '../types';
+import type { WidgetProps } from './registry';
 
 const VARIANTS: Record<string, string> = {
   primary:   'bg-blue-600 text-white border-blue-600 hover:bg-blue-700',
   secondary: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
   danger:    'bg-red-600 text-white border-red-600 hover:bg-red-700',
   ghost:     'bg-transparent text-gray-700 border-transparent hover:bg-gray-100',
-}
+};
 
 export function ButtonWidget({ component, runtime, onEvent }: WidgetProps) {
-  const [loading, setLoading] = React.useState(false)
+  const [loading, setLoading] = React.useState(false);
 
-  const label   = String(runtime.evaluate(String(component.props.text ?? 'Click Me')))
-  const variant = String(component.props.variant ?? 'primary')
-  const isDisabled = Boolean(component.props.disabled) || loading
+  // Safely evaluate the text prop - if it's not an expression, just use the value
+  const textProp = component.props.text ?? 'Click Me';
+  let label: string = String(textProp);
+  try {
+    // Only evaluate if it looks like an expression (starts with {{ or is a string template)
+    if (typeof textProp === 'string' && (textProp.trim().startsWith('{{') || textProp.includes('$'))) {
+      label = String(runtime.evaluate(textProp));
+    }
+  } catch (e) {
+    console.error('Failed to evaluate button text:', e);
+    label = String(textProp);
+  }
+  
+  const variant = String(component.props.variant ?? 'primary');
+  const isDisabled = Boolean(component.props.disabled) || loading;
 
   const handleClick = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      onEvent('click')
+      onEvent('click');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <button
@@ -40,7 +52,7 @@ export function ButtonWidget({ component, runtime, onEvent }: WidgetProps) {
       {loading && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
       {label}
     </button>
-  )
+  );
 }
 
 export const ButtonDefinition: ComponentDefinition = {
@@ -55,4 +67,4 @@ export const ButtonDefinition: ComponentDefinition = {
   defaultEvents: {
     click: '',
   },
-}
+};

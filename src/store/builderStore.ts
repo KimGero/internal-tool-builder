@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { App, Appcomponent as AppComponent, DataSource } from '../types'
+import type { App, AppComponent as AppComponent, DataSource } from '../types'
 
 interface BuilderStore {
   app: App

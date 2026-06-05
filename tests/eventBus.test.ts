@@ -1,4 +1,4 @@
-// tests/eventBus.test.ts
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { EventBus } from '../src/core/eventBus'
 

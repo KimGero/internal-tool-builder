@@ -59,7 +59,7 @@ export function ChartWidget({ component, data: canvasData, runtime }: WidgetProp
     const raw = ExpressionEngine.evaluateRaw(expr, runtime.state)
     return Array.isArray(raw) ? raw : []
   
-  }, [canvasData, component.props.data, runtime.state]) as Record<string, unknown>[]
+  }, [canvasData, component.props.data, runtime.stateVersion]) as Record<string, unknown>[]
 
   
   const resolvedSeries = React.useMemo((): Required<ChartSeries>[] => {

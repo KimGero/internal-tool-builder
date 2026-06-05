@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { TableWidget } from '../src/components/TableWidget'
 import type { AppComponent, Runtime } from '../src/types'
 import '@testing-library/jest-dom'
@@ -10,6 +10,7 @@ import '@testing-library/jest-dom'
 function makeRuntime(state: Record<string, unknown> = {}): Runtime {
   return {
     state,
+    stateVersion: 0,
     setState: vi.fn(),
     evaluate: vi.fn((expr: string) => expr),
   }
@@ -46,7 +47,7 @@ const getHeaders = () =>
   screen.getAllByRole('columnheader').map(th => th.textContent?.trim() ?? '')
 
 
-describe('TableWidget — rendering', () => {
+describe('TableWidget Ã¢â‚¬â€ rendering', () => {
   it('renders column headers from props', () => {
     render(<TableWidget component={makeComponent()} runtime={makeRuntime()} onEvent={vi.fn()} />)
     expect(getHeaders()).toEqual(expect.arrayContaining(['ID', 'Name']))
@@ -99,7 +100,7 @@ describe('TableWidget — rendering', () => {
   })
 })
 
-describe('TableWidget — data source from runtime state', () => {
+describe('TableWidget Ã¢â‚¬â€ data source from runtime state', () => {
   it('resolves data from runtime state when no canvasData is passed', () => {
     
     render(
@@ -127,7 +128,7 @@ describe('TableWidget — data source from runtime state', () => {
   })
 })
 
-describe('TableWidget — search', () => {
+describe('TableWidget Ã¢â‚¬â€ search', () => {
   it('filters rows case-insensitively', () => {
     render(
       <TableWidget component={makeComponent()} data={ROWS} runtime={makeRuntime()} onEvent={vi.fn()} />
@@ -150,7 +151,7 @@ describe('TableWidget — search', () => {
   })
 })
 
-describe('TableWidget — sorting', () => {
+describe('TableWidget Ã¢â‚¬â€ sorting', () => {
   const UNSORTED = [
     { id: 3, name: 'Charlie' },
     { id: 1, name: 'Alice' },
@@ -191,7 +192,7 @@ describe('TableWidget — sorting', () => {
   })
 })
 
-describe('TableWidget — events', () => {
+describe('TableWidget Ã¢â‚¬â€ events', () => {
   it('fires rowClick with the row and index', () => {
     const onEvent = vi.fn()
     render(
@@ -202,7 +203,7 @@ describe('TableWidget — events', () => {
   })
 })
 
-describe('TableWidget — selection', () => {
+describe('TableWidget Ã¢â‚¬â€ selection', () => {
   it('fires selectionChange when a row is clicked in selectable mode', () => {
     const onEvent = vi.fn()
     render(

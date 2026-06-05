@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { FormWidget } from '../src/components/FormWidget'
 import type { AppComponent, Runtime } from '../src/types'
 
@@ -8,6 +8,7 @@ import type { AppComponent, Runtime } from '../src/types'
 function makeRuntime(state: Record<string, unknown> = {}): Runtime {
   return {
     state,
+    stateVersion: 0,
     setState: vi.fn(),
     evaluate: vi.fn((expr: string) => expr),
   }
@@ -32,7 +33,7 @@ function makeComponent(overrides: Partial<AppComponent['props']> = {}): AppCompo
 }
 
 
-describe('FormWidget — rendering', () => {
+describe('FormWidget ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â rendering', () => {
   it('renders a field for each configured entry', () => {
     render(<FormWidget component={makeComponent()} runtime={makeRuntime()} onEvent={vi.fn()} />)
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
@@ -93,7 +94,7 @@ describe('FormWidget — rendering', () => {
   })
 })
 
-describe('FormWidget — initialisation from runtime state', () => {
+describe('FormWidget ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â initialisation from runtime state', () => {
   it('pre-fills fields from the runtime binding', () => {
     const runtime = makeRuntime({ formData: { name: 'Alice', email: 'alice@test.com' } })
     render(<FormWidget component={makeComponent()} runtime={runtime} onEvent={vi.fn()} />)
@@ -102,7 +103,7 @@ describe('FormWidget — initialisation from runtime state', () => {
   })
 })
 
-describe('FormWidget — field interaction', () => {
+describe('FormWidget ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â field interaction', () => {
   it('fires fieldChange when a field value changes', () => {
     const onEvent = vi.fn()
     render(<FormWidget component={makeComponent()} runtime={makeRuntime()} onEvent={onEvent} />)
@@ -133,7 +134,7 @@ describe('FormWidget — field interaction', () => {
   })
 })
 
-describe('FormWidget — validation', () => {
+describe('FormWidget ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â validation', () => {
   it('shows an error for empty required fields on submit', async () => {
     render(<FormWidget component={makeComponent()} runtime={makeRuntime()} onEvent={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: /submit/i }))
@@ -152,12 +153,12 @@ describe('FormWidget — validation', () => {
     render(<FormWidget component={makeComponent()} runtime={makeRuntime()} onEvent={vi.fn()} />)
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Bob' } })
     fireEvent.click(screen.getByRole('button', { name: /submit/i }))
-    // email is not required — no error for it
+    // email is not required ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no error for it
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })
 
-describe('FormWidget — submission', () => {
+describe('FormWidget ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â submission', () => {
   it('fires submit with all field values when form is valid', () => {
     const onEvent = vi.fn()
     render(<FormWidget component={makeComponent()} runtime={makeRuntime()} onEvent={onEvent} />)
@@ -170,7 +171,7 @@ describe('FormWidget — submission', () => {
   })
 })
 
-describe('FormWidget — reset', () => {
+describe('FormWidget ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â reset', () => {
   it('clears all fields and fires reset event', () => {
     const onEvent = vi.fn()
     render(

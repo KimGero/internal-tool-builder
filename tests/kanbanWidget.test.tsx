@@ -5,7 +5,7 @@ import type { AppComponent, Runtime } from '../src/types'
 
 
 function makeRuntime(state: Record<string, unknown> = {}): Runtime {
-  return { state, setState: vi.fn(), evaluate: vi.fn((e: string) => e) }
+  return { state, stateVersion: 0, setState: vi.fn(), evaluate: vi.fn((e: string) => e) }
 }
 
 const DEFAULT_COLUMNS = [
@@ -39,7 +39,7 @@ const ITEMS = [
 ]
 
 
-describe('KanbanWidget — column rendering', () => {
+describe('KanbanWidget Ã¢â‚¬â€ column rendering', () => {
   it('renders all columns', () => {
     render(<KanbanWidget component={makeComponent()} data={ITEMS} runtime={makeRuntime()} onEvent={vi.fn()} />)
     expect(screen.getByRole('region', { name: /to do/i        })).toBeInTheDocument()
@@ -61,7 +61,7 @@ describe('KanbanWidget — column rendering', () => {
   })
 })
 
-describe('KanbanWidget — card distribution', () => {
+describe('KanbanWidget Ã¢â‚¬â€ card distribution', () => {
   it('places each card in the correct column', () => {
     render(<KanbanWidget component={makeComponent()} data={ITEMS} runtime={makeRuntime()} onEvent={vi.fn()} />)
     const todoCol = screen.getByRole('region', { name: /to do/i })
@@ -77,7 +77,7 @@ describe('KanbanWidget — card distribution', () => {
   })
 })
 
-describe('KanbanWidget — search', () => {
+describe('KanbanWidget Ã¢â‚¬â€ search', () => {
   it('hides non-matching cards', () => {
     render(<KanbanWidget component={makeComponent()} data={ITEMS} runtime={makeRuntime()} onEvent={vi.fn()} />)
     fireEvent.change(screen.getByRole('textbox', { name: /search cards/i }), {
@@ -99,7 +99,7 @@ describe('KanbanWidget — search', () => {
   it('column header count is not affected by search (shows total, not filtered)', () => {
     render(<KanbanWidget component={makeComponent()} data={ITEMS} runtime={makeRuntime()} onEvent={vi.fn()} />)
     fireEvent.change(screen.getByRole('textbox', { name: /search cards/i }), {
-      target: { value: 'login' },   // only 1 todo card matches
+      target: { value: 'login' },   
     })
     const todoCol = screen.getByRole('region', { name: /to do/i })
 
@@ -107,7 +107,7 @@ describe('KanbanWidget — search', () => {
   })
 })
 
-describe('KanbanWidget — drag and drop', () => {
+describe('KanbanWidget Ã¢â‚¬â€ drag and drop', () => {
   it('moves a card to the target column on drop', () => {
     render(<KanbanWidget component={makeComponent()} data={ITEMS} runtime={makeRuntime()} onEvent={vi.fn()} />)
     const card       = screen.getByRole('article', { name: /write tests/i })
@@ -147,7 +147,7 @@ describe('KanbanWidget — drag and drop', () => {
   })
 })
 
-describe('KanbanWidget — WIP limits', () => {
+describe('KanbanWidget Ã¢â‚¬â€ WIP limits', () => {
   it('does not move the card when the target column is at its limit', () => {
 
     const atLimit = [
@@ -188,7 +188,7 @@ describe('KanbanWidget — WIP limits', () => {
   })
 })
 
-describe('KanbanWidget — events', () => {
+describe('KanbanWidget Ã¢â‚¬â€ events', () => {
   it('fires itemClick with the card item', () => {
     const onEvent = vi.fn()
     render(<KanbanWidget component={makeComponent()} data={ITEMS} runtime={makeRuntime()} onEvent={onEvent} />)
