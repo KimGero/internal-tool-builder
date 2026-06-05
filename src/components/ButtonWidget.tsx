@@ -14,11 +14,11 @@ const VARIANTS: Record<string, string> = {
 export function ButtonWidget({ component, runtime, onEvent }: WidgetProps) {
   const [loading, setLoading] = React.useState(false);
 
-  // Safely evaluate the text prop - if it's not an expression, just use the value
+  
   const textProp = component.props.text ?? 'Click Me';
   let label: string = String(textProp);
   try {
-    // Only evaluate if it looks like an expression (starts with {{ or is a string template)
+    
     if (typeof textProp === 'string' && (textProp.trim().startsWith('{{') || textProp.includes('$'))) {
       label = String(runtime.evaluate(textProp));
     }

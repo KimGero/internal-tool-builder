@@ -49,7 +49,7 @@ export class StateManager {
             try {
                 const raw = localStorage.getItem(`runtime:${key}`)
                 if (raw) this.state[key] = JSON.parse(raw)
-            } catch {/* corrupted, skip */}
+            } catch {}
         
         }
 

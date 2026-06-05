@@ -7,19 +7,19 @@ interface BuilderStore {
   selectedId: string | null
   isDirty: boolean
 
-  // App
+  
   setName: (name: string) => void
   loadApp: (app: App) => void
   newApp: () => void
 
-  // Components
+  
   addComponent: (c: AppComponent) => void
   updateComponent: (id: string, updates: Partial<AppComponent>) => void
   removeComponent: (id: string) => void
   reorderComponents: (components: AppComponent[]) => void
   selectComponent: (id: string | null) => void
 
-  // Data sources
+  
   addDataSource: (ds: DataSource) => void
   updateDataSource: (id: string, updates: Partial<DataSource>) => void
   removeDataSource: (id: string) => void

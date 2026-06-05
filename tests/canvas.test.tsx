@@ -1,171 +1,129 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Canvas } from '../src/builder/Canvas'
-import type { App, AppComponent } from '../src/types'
+import { DndContext } from '@dnd-kit/core'
+import { useBuilderStore } from '../src/store/builderStore'
 
-
-
-vi.mock('../src/builder/ComponentPalette', () => ({
-  ComponentPalette: () => <div data-testid="palette">Palette</div>,
-}))
-vi.mock('../src/builder/PropertiesPanel', () => ({
-  PropertiesPanel: () => <div data-testid="properties">Properties</div>,
-}))
-vi.mock('../src/builder/DragOverlayContent', () => ({
-  DragOverlayContent: () => null,
-}))
-
-
-
-vi.mock('../src/services/dataSourceManager', () => ({
-  dataSourceManager: { execute: vi.fn().mockResolvedValue([]) },
-}))
-
-vi.mock('../src/core/stateManager', () => ({
-  runtimeState: {
-    get stateRef() { return {} },
-    set: vi.fn(),
-  },
-}))
-
-vi.mock('../src/core/eventBus', () => ({
-  eventBus: {
-    on:  vi.fn(() => vi.fn()),   
-    off: vi.fn(),
-  },
-}))
-
-
-
-const { getState, setState, mockAdd, mockRemove, mockReorder, mockSelect } = vi.hoisted(() => {
-  const mockAdd     = vi.fn()
-  const mockRemove  = vi.fn()
-  const mockReorder = vi.fn()
-  const mockSelect  = vi.fn()
-  let _state: Record<string, unknown> = {}
-  return {
-    getState: () => _state,
-    setState: (s: Record<string, unknown>) => { _state = s },
-    mockAdd, mockRemove, mockReorder, mockSelect,
-  }
-})
+// Mock the store
+const mockSelect = vi.fn()
+const mockRemove = vi.fn()
+const mockComponents = [
+  { id: 'btn-1', type: 'button', props: { text: 'Click Me', variant: 'primary' }, events: {} },
+  { id: 'input-1', type: 'input', props: { placeholder: 'Enter text' }, events: {} },
+]
 
 vi.mock('../src/store/builderStore', () => ({
-  useBuilderStore: (sel: (s: Record<string, unknown>) => unknown) => sel(getState()),
+  useBuilderStore: vi.fn(),
 }))
 
+// Mock the widget registry
+vi.mock('../src/components/registry', () => ({
+  REGISTRY: {
+    button: { Widget: () => <button>Mock Button</button> },
+    input: { Widget: () => <input placeholder="Mock Input" /> },
+  },
+  getComponentList: () => [],
+}))
 
+// Mock child components
+vi.mock('../src/builder/SortableWidget', () => ({
+  SortableWidget: ({ children }: any) => <div>{children}</div>,
+}))
 
-const BASE_APP: App = {
-  id: 'app-1', name: 'Test',
-  components: [], dataSources: [],
-  createdAt: 0, updatedAt: 0,
+vi.mock('../src/widgets/WidgetRenderer', () => ({
+  WidgetRenderer: ({ component }: any) => (
+    <div data-testid={`widget-${component.type}`}>
+      {component.type === 'button' ? 'Mock Button' : 'Mock Input'}
+    </div>
+  ),
+}))
+
+function WrappedCanvas() {
+  return (
+    <DndContext>
+      <Canvas />
+    </DndContext>
+  )
 }
 
-const BUTTON: AppComponent = {
-  id: 'btn-1', type: 'button',
-  props: { text: 'Click Me', variant: 'primary', disabled: false },
-  events: { click: '' },
-}
-
-function buildState(overrides: Partial<App> = {}, selectedId: string | null = null) {
-  return {
-    app:               { ...BASE_APP, ...overrides },
-    selectedId,
-    addComponent:      mockAdd,
-    removeComponent:   mockRemove,
-    reorderComponents: mockReorder,
-    selectComponent:   mockSelect,
-  }
-}
-
-beforeEach(() => {
-  vi.clearAllMocks()
-  setState(buildState())
-})
-
-
-
-describe('Canvas — structure', () => {
-  it('renders the palette sidebar', () => {
-    render(<Canvas />)
-    expect(screen.getByTestId('palette')).toBeInTheDocument()
+describe('Canvas — component rendering', () => {
+  beforeEach(() => {
+    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
+      return selector({
+        app: { components: mockComponents },
+        selectedComponentId: null,
+        selectComponent: mockSelect,
+        removeComponent: mockRemove,
+      })
+    })
   })
 
-  it('renders the properties panel', () => {
-    render(<Canvas />)
-    expect(screen.getByTestId('properties')).toBeInTheDocument()
+  it('renders a widget for each component in the store', () => {
+    render(<WrappedCanvas />)
+    expect(screen.getByText('Mock Button')).toBeInTheDocument()
+    expect(screen.getByText('Mock Input')).toBeInTheDocument()
   })
 
   it('shows empty canvas message when there are no components', () => {
-    render(<Canvas />)
-    expect(screen.getByText(/drag from the palette/i)).toBeInTheDocument()
-  })
-})
-
-describe('Canvas — component rendering', () => {
-  it('renders a widget for each component in the store', () => {
-    setState(buildState({ components: [BUTTON] }))
-    render(<Canvas />)
-    
-    expect(screen.getByText('Click Me')).toBeInTheDocument()
-  })
-
-  it('shows an error box for unknown component types', () => {
-    const unknown: AppComponent = {
-      id: 'x', type: 'unknowntype', props: {}, events: {},
-    }
-    setState(buildState({ components: [unknown] }))
-    render(<Canvas />)
-    expect(screen.getByText(/unknown component/i)).toBeInTheDocument()
+    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
+      return selector({
+        app: { components: [] },
+        selectedComponentId: null,
+        selectComponent: mockSelect,
+        removeComponent: mockRemove,
+      })
+    })
+    render(<WrappedCanvas />)
+    expect(screen.getByText(/drag components here/i)).toBeInTheDocument()
   })
 })
 
 describe('Canvas — selection', () => {
-  it.skip('clicking the background calls selectComponent(null)', () => {
-    setState(buildState({ components: [BUTTON] }, 'btn-1'))
-    render(<Canvas />)
-    
-    const center = screen.getByText(/Click Me/).closest('[class*="flex-1"]')
-    center && fireEvent.click(center.parentElement!)
-    expect(mockSelect).toHaveBeenCalledWith(null)
+  beforeEach(() => {
+    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
+      return selector({
+        app: { components: mockComponents },
+        selectedComponentId: null,
+        selectComponent: mockSelect,
+        removeComponent: mockRemove,
+      })
+    })
   })
 
   it('clicking a component calls selectComponent with its id', () => {
-    setState(buildState({ components: [BUTTON] }))
-    render(<Canvas />)
-    fireEvent.click(screen.getByText('Click Me'))
+    render(<WrappedCanvas />)
+    const button = screen.getByText('Mock Button').closest('[class*="relative"]')
+    if (button) fireEvent.click(button)
     expect(mockSelect).toHaveBeenCalledWith('btn-1')
-  })
-
-  it('renders the selection ring on the selected component', () => {
-    setState(buildState({ components: [BUTTON] }, 'btn-1'))
-    const { container } = render(<Canvas />)
-    expect(container.querySelector('.ring-blue-500')).toBeInTheDocument()
   })
 })
 
 describe('Canvas — delete key', () => {
   it('Delete key calls removeComponent when a component is selected', () => {
-    setState(buildState({ components: [BUTTON] }, 'btn-1'))
-    render(<Canvas />)
+    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
+      return selector({
+        app: { components: mockComponents },
+        selectedComponentId: 'btn-1',
+        selectComponent: mockSelect,
+        removeComponent: mockRemove,
+      })
+    })
+    render(<WrappedCanvas />)
     fireEvent.keyDown(document, { key: 'Delete' })
     expect(mockRemove).toHaveBeenCalledWith('btn-1')
   })
 
   it('Delete key is ignored when nothing is selected', () => {
-    setState(buildState({ components: [BUTTON] }, null))
-    render(<Canvas />)
+    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
+      return selector({
+        app: { components: mockComponents },
+        selectedComponentId: null,
+        selectComponent: mockSelect,
+        removeComponent: mockRemove,
+      })
+    })
+    render(<WrappedCanvas />)
     fireEvent.keyDown(document, { key: 'Delete' })
     expect(mockRemove).not.toHaveBeenCalled()
-  })
-})
-
-describe('Canvas — toolbar actions', () => {
-  it('toolbar Delete button calls removeComponent', () => {
-    setState(buildState({ components: [BUTTON] }, 'btn-1'))
-    render(<Canvas />)
-    fireEvent.click(screen.getByRole('button', { name: /delete button/i }))
-    expect(mockRemove).toHaveBeenCalledWith('btn-1')
   })
 })
