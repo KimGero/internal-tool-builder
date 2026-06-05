@@ -1,15 +1,17 @@
 import type React from 'react'
 import type { ComponentDefinition, AppComponent, Runtime } from '../types'
-import { ButtonWidget, ButtonDefinition } from './ButtonWidget'
-import { InputWidget,  InputDefinition  } from './InputWidget'
-import { TableWidget,  TableDefinition  } from './TableWidget'
-import { FormWidget,   FormDefinition   } from './FormWidget'
-import { ChartWidget,  ChartDefinition  } from './ChartWidget'
+import { ButtonWidget,     ButtonDefinition     } from './ButtonWidget'
+import { InputWidget,      InputDefinition      } from './InputWidget'
+import { TableWidget,      TableDefinition      } from './TableWidget'
+import { FormWidget,       FormDefinition       } from './FormWidget'
+import { ChartWidget,      ChartDefinition      } from './ChartWidget'
+import { DatePickerWidget, DatePickerDefinition } from './DatePickerWidget'
+import { KanbanWidget,     KanbanDefinition     } from './KanbanWidget'
 
 export interface WidgetProps {
   component: AppComponent
   runtime: Runtime
-  data?: unknown[]           
+  data?: unknown[]
   onEvent: (event: string, data?: unknown) => void
 }
 
@@ -18,11 +20,13 @@ export interface RegistryEntry extends ComponentDefinition {
 }
 
 export const REGISTRY: Record<string, RegistryEntry> = {
-  button: { ...ButtonDefinition, Widget: ButtonWidget },
-  input:  { ...InputDefinition,  Widget: InputWidget  },
-  table:  { ...TableDefinition,  Widget: TableWidget  },
-  form:   { ...FormDefinition,   Widget: FormWidget   },
-  chart:  { ...ChartDefinition,  Widget: ChartWidget  },
+  button:     { ...ButtonDefinition,     Widget: ButtonWidget     },
+  input:      { ...InputDefinition,      Widget: InputWidget      },
+  table:      { ...TableDefinition,      Widget: TableWidget      },
+  form:       { ...FormDefinition,       Widget: FormWidget       },
+  chart:      { ...ChartDefinition,      Widget: ChartWidget      },
+  datepicker: { ...DatePickerDefinition, Widget: DatePickerWidget },
+  kanban:     { ...KanbanDefinition,     Widget: KanbanWidget     },
 }
 
 export const getComponentList = (): RegistryEntry[] => Object.values(REGISTRY)
