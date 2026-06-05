@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import type { Active } from '@dnd-kit/core'
-import { getComponentList, REGISTRY } from '../components/registry'
+import { REGISTRY } from '../components/registry'
 
 interface Props {
   active: Active | null
