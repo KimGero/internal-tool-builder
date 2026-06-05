@@ -12,7 +12,7 @@ export interface FormField {
   placeholder?: string
   required?: boolean
   defaultValue?: string
-  options?: Array<{ label: string; value: string }>  // select only
+  options?: Array<{ label: string; value: string }> 
 }
 
 type FieldValues = Record<string, string>
@@ -74,7 +74,6 @@ export function FormWidget({ component, runtime, onEvent }: WidgetProps) {
   const handleChange = (name: string, raw: string) => {
     const next = { ...values, [name]: raw }
     pushValues(next)
-    // Clear the error for this field as soon as the user starts correcting it
     if (errors[name]) setErrors(e => { const n = { ...e }; delete n[name]; return n })
     onEvent('fieldChange', { name, value: raw, values: next })
   }
