@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useBuilderStore } from '../store/builderStore'
@@ -17,16 +17,24 @@ function CanvasContent({ previewMode = false }: { previewMode?: boolean }) {
     id: 'canvas-dropzone',
   })
 
-  // Delete key handler
+  // Delete key handler - MUST be after all hook declarations
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Delete' && selectedId) {
-        removeComponent(selectedId)
+      if (e.key === 'Delete' || e.key === 'Del') {
+        if (selectedId) {
+          e.preventDefault()
+          removeComponent(selectedId)
+        }
+      }
+      // Escape key deselects
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        selectComponent(null)
       }
     }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [selectedId, removeComponent])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedId, removeComponent, selectComponent])
 
   if (components.length === 0) {
     return (
@@ -45,7 +53,7 @@ function CanvasContent({ previewMode = false }: { previewMode?: boolean }) {
           <SortableWidget key={component.id} id={component.id}>
             <div
               className={clsx(
-                'relative group rounded-lg transition-all',
+                'relative group rounded-lg transition-all cursor-pointer',
                 selectedId === component.id && 'ring-2 ring-blue-500 ring-offset-2'
               )}
               onClick={(e) => {

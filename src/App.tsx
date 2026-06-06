@@ -27,6 +27,8 @@ import { FolderOpen }       from 'lucide-react'
 import { SaveLoadDialog }   from './builder/SaveLoadDialog'
 import { saveApp as persistApp } from './services/appStorage'
 import type { App }         from './types'
+import { Undo2, Redo2 }         from 'lucide-react'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts' 
 
 
 type Mode = 'design' | 'data' | 'preview'
@@ -59,10 +61,19 @@ export default function App() {
   const addComponent      = useBuilderStore(s => s.addComponent)
   const reorderComponents = useBuilderStore(s => s.reorderComponents)
   const markClean         = useBuilderStore(s => s.markClean)
-  const app     = useBuilderStore(s => s.app)
-  const loadApp = useBuilderStore(s => s.loadApp)
+  const app               = useBuilderStore(s => s.app)
+  const loadApp           = useBuilderStore(s => s.loadApp)
+  const selectedId        = useBuilderStore(s => s.selectedId)
+  const removeComponent   = useBuilderStore(s => s.removeComponent)
+  const selectComponent   = useBuilderStore(s => s.selectComponent)
+  const duplicateComponent= useBuilderStore(s => s.duplicateComponent)
+  const undo              = useBuilderStore(s => s.undo)
+  const redo              = useBuilderStore(s => s.redo)
+  const canUndo           = useBuilderStore(s => s.past.length > 0)
+  const canRedo           = useBuilderStore(s => s.future.length > 0)
 
   const [showApps, setShowApps] = useState(false)
+
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -116,8 +127,34 @@ export default function App() {
     setMode('design')
   }, [isDirty, newApp])
 
+  const handleDelete = useCallback(() => {
+  if (!selectedId) return
+  removeComponent(selectedId)
+  }, [selectedId, removeComponent])
+
+  const handleEscape = useCallback(() => {
+    selectComponent(null)
+  }, [selectComponent])
+
+  const handleDuplicate = useCallback(() => {
+    if (!selectedId) return
+    duplicateComponent(selectedId)
+  }, [selectedId, duplicateComponent])
+
+  const handleUndo = useCallback(() => undo(), [undo])
+  const handleRedo = useCallback(() => redo(), [redo])
+
   const isDesignMode = mode === 'design'
   const isPreviewMode = mode === 'preview'
+
+  useKeyboardShortcuts({
+    onDelete:    handleDelete,
+    onEscape:    handleEscape,
+    onUndo:      handleUndo,
+    onRedo:      handleRedo,
+    onSave:      handleSave,
+    onDuplicate: handleDuplicate,
+    })  
 
   {showApps && (
   <SaveLoadDialog
@@ -223,6 +260,32 @@ export default function App() {
           {/* Right sidebar */}
           {isDesignMode && <PropertiesPanel />}
         </div>
+        
+        {/* History controls */}
+        <div className="flex items-center gap-0.5 ml-1">
+          <button
+            aria-label="Undo"
+            title="Ctrl+Z"
+            onClick={handleUndo}
+            disabled={!canUndo}
+            className="p-1.5 rounded text-gray-500 transition-colors
+              hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <Undo2 className="w-4 h-4" aria-hidden="true" />
+          </button>
+          <button
+            aria-label="Redo"
+            title="Ctrl+Y"
+            onClick={handleRedo}
+            disabled={!canRedo}
+            className="p-1.5 rounded text-gray-500 transition-colors
+              hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <Redo2 className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="w-px h-5 bg-gray-200 mx-1" aria-hidden="true" />
 
         <DragOverlay>
           <DragOverlayContent active={activeItem} />

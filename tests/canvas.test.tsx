@@ -2,11 +2,11 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Canvas } from '../src/builder/Canvas'
 import { DndContext } from '@dnd-kit/core'
-import { useBuilderStore } from '../src/store/builderStore'
 
 // Mock the store
-const mockSelect = vi.fn()
-const mockRemove = vi.fn()
+let mockSelect = vi.fn()
+let mockRemove = vi.fn()
+
 const mockComponents = [
   { id: 'btn-1', type: 'button', props: { text: 'Click Me', variant: 'primary' }, events: {} },
   { id: 'input-1', type: 'input', props: { placeholder: 'Enter text' }, events: {} },
@@ -15,6 +15,8 @@ const mockComponents = [
 vi.mock('../src/store/builderStore', () => ({
   useBuilderStore: vi.fn(),
 }))
+
+import { useBuilderStore } from '../src/store/builderStore'
 
 // Mock the widget registry
 vi.mock('../src/components/registry', () => ({
@@ -48,10 +50,12 @@ function WrappedCanvas() {
 
 describe('Canvas — component rendering', () => {
   beforeEach(() => {
+    mockSelect = vi.fn()
+    mockRemove = vi.fn()
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
       return selector({
         app: { components: mockComponents },
-        selectedComponentId: null,
+        selectedId: null,
         selectComponent: mockSelect,
         removeComponent: mockRemove,
       })
@@ -68,7 +72,7 @@ describe('Canvas — component rendering', () => {
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
       return selector({
         app: { components: [] },
-        selectedComponentId: null,
+        selectedId: null,
         selectComponent: mockSelect,
         removeComponent: mockRemove,
       })
@@ -80,10 +84,12 @@ describe('Canvas — component rendering', () => {
 
 describe('Canvas — selection', () => {
   beforeEach(() => {
+    mockSelect = vi.fn()
+    mockRemove = vi.fn()
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
       return selector({
         app: { components: mockComponents },
-        selectedComponentId: null,
+        selectedId: null,
         selectComponent: mockSelect,
         removeComponent: mockRemove,
       })
@@ -99,31 +105,37 @@ describe('Canvas — selection', () => {
 })
 
 describe('Canvas — delete key', () => {
+  beforeEach(() => {
+    mockSelect = vi.fn()
+    mockRemove = vi.fn()
+  })
+
   it('Delete key calls removeComponent when a component is selected', () => {
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
       return selector({
         app: { components: mockComponents },
-        selectedComponentId: 'btn-1',
+        selectedId: 'btn-1',
         selectComponent: mockSelect,
         removeComponent: mockRemove,
       })
     })
     render(<WrappedCanvas />)
-    fireEvent.keyDown(document, { key: 'Delete' })
+    fireEvent.keyDown(window, { key: 'Delete' })
     expect(mockRemove).toHaveBeenCalledWith('btn-1')
+    expect(mockRemove).toHaveBeenCalledTimes(1)
   })
 
   it('Delete key is ignored when nothing is selected', () => {
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
       return selector({
         app: { components: mockComponents },
-        selectedComponentId: null,
+        selectedId: null,
         selectComponent: mockSelect,
         removeComponent: mockRemove,
       })
     })
     render(<WrappedCanvas />)
-    fireEvent.keyDown(document, { key: 'Delete' })
+    fireEvent.keyDown(window, { key: 'Delete' })
     expect(mockRemove).not.toHaveBeenCalled()
   })
 })

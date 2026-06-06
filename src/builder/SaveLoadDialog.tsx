@@ -61,7 +61,7 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
     setError(null)
     const app = loadSave(id)
     if (!app) {
-      setError('Could not load that save — it may have been cleared from storage.')
+      setError('Could not load that save â€” it may have been cleared from storage.')
       refresh()
       return
     }
@@ -80,7 +80,7 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
     <>
       
       <div
-        className="fixed inset-0 bg-black/40 z-40"
+        data-testid="dialog-backdrop" className="fixed inset-0 bg-black/40 z-40"
         aria-hidden="true"
         onClick={onClose}
       />
@@ -147,7 +147,7 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload className="w-3.5 h-3.5" aria-hidden="true" />
-              {importing ? 'Importing…' : 'Import JSON'}
+              {importing ? 'Importingâ€¦' : 'Import JSON'}
             </button>
 
             <input

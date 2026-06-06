@@ -94,7 +94,7 @@ describe('exportApp', () => {
 
     exportApp({ ...mockApp, name: 'My App! (v2)' })
 
-    expect(anchor.download).toBe('My-App--v2-.json')
+    expect(anchor.download).toBe('My-App-v2-.json')
   })
 })
 

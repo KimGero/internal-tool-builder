@@ -97,7 +97,12 @@ export function saveApp(app: App): SaveMeta {
     index[existingIdx] = meta              
   } else {
     index.unshift(meta)                    
-    if (index.length > MAX_SAVES) index.pop()
+    if (index.length > MAX_SAVES) {
+  const evicted = index.pop()
+  if (evicted) {
+    try { localStorage.removeItem(APP_KEY(evicted.id)) } catch { /* ignore */ }
+  }
+}
   }
 
   writeIndex(index)
