@@ -23,6 +23,11 @@ import { Canvas }               from './builder/Canvas'
 import { DataSourcePanel }      from './builder/DataSourcePanel'
 import type { AppComponent } from './types'
 import type { RegistryEntry }   from './components/registry'
+import { FolderOpen }       from 'lucide-react'
+import { SaveLoadDialog }   from './builder/SaveLoadDialog'
+import { saveApp as persistApp } from './services/appStorage'
+import type { App }         from './types'
+
 
 type Mode = 'design' | 'data' | 'preview'
 
@@ -54,6 +59,10 @@ export default function App() {
   const addComponent      = useBuilderStore(s => s.addComponent)
   const reorderComponents = useBuilderStore(s => s.reorderComponents)
   const markClean         = useBuilderStore(s => s.markClean)
+  const app     = useBuilderStore(s => s.app)
+  const loadApp = useBuilderStore(s => s.loadApp)
+
+  const [showApps, setShowApps] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -88,8 +97,17 @@ export default function App() {
   }, [components, addComponent, reorderComponents])
 
   const handleSave = useCallback(() => {
+    persistApp(app)
     markClean()
-  }, [markClean])
+  }, [app, markClean])
+
+  const handleLoadApp = useCallback((loaded: App) => {
+  loadApp(loaded)           
+  runtimeState.reset()      
+  setMode('design')         
+  }, [loadApp])
+
+  
 
   const handleNew = useCallback(() => {
     if (isDirty && !window.confirm('Discard unsaved changes and start a new app?')) return
@@ -100,6 +118,14 @@ export default function App() {
 
   const isDesignMode = mode === 'design'
   const isPreviewMode = mode === 'preview'
+
+  {showApps && (
+  <SaveLoadDialog
+    currentApp={app}
+    onLoad={handleLoadApp}
+    onClose={() => setShowApps(false)}
+    />
+  )}
 
   return (
     <DndContext
@@ -157,6 +183,17 @@ export default function App() {
           )}
 
           <button
+              aria-label="Open apps"
+              onClick={() => setShowApps(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
+                text-gray-600 border border-gray-200 rounded
+                hover:bg-gray-50 transition-colors"
+                >
+            <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />
+              Apps
+          </button>
+
+          <button
             aria-label="New app"
             onClick={handleNew}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
@@ -169,7 +206,7 @@ export default function App() {
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Left sidebar - only in design mode */}
+          {/* Left sidebar */}
           {isDesignMode && <ComponentPalette />}
 
           {/* Main content area */}
@@ -183,7 +220,7 @@ export default function App() {
             </main>
           )}
 
-          {/* Right sidebar - only in design mode */}
+          {/* Right sidebar */}
           {isDesignMode && <PropertiesPanel />}
         </div>
 
