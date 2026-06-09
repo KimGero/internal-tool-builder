@@ -71,13 +71,21 @@ const baseApp: AppType = {
 
 function buildState(overrides: Record<string, unknown> = {}) {
   return {
-    app:             baseApp,
-    isDirty:         false,
-    setName:         mockSetName,
-    newApp:          mockNewApp,
-    markClean:       mockMarkClean,
-    addComponent:    vi.fn(),
-    reorderComponents: vi.fn(),
+    app:                baseApp,
+    isDirty:            false,
+    past:               [],        // ← Day 12 — was missing
+    future:             [],        // ← Day 12 — was missing
+    setName:            mockSetName,
+    newApp:             mockNewApp,
+    loadApp:            vi.fn(),   // ← Day 11 — was missing
+    markClean:          mockMarkClean,
+    addComponent:       vi.fn(),
+    reorderComponents:  vi.fn(),
+    removeComponent:    vi.fn(),   // ← Day 12 — was missing
+    selectComponent:    vi.fn(),   // ← Day 12 — was missing
+    duplicateComponent: vi.fn(),   // ← Day 12 — was missing
+    undo:               vi.fn(),   // ← Day 12 — was missing
+    redo:               vi.fn(),   // ← Day 12 — was missing
     ...overrides,
   }
 }

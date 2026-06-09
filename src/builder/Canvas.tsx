@@ -17,7 +17,7 @@ function CanvasContent({ previewMode = false }: { previewMode?: boolean }) {
     id: 'canvas-dropzone',
   })
 
-  // Delete key handler - MUST be after all hook declarations
+  
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Del') {

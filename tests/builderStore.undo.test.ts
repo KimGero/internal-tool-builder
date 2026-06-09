@@ -3,80 +3,64 @@ import { useBuilderStore } from '../src/store/builderStore'
 import type { AppComponent } from '../src/types'
 
 const c1: AppComponent = { id: 'c1', type: 'button', props: { text: 'A' }, events: {} }
-const c2: AppComponent = { id: 'c2', type: 'input', props: { label: 'B' }, events: {} }
+const c2: AppComponent = { id: 'c2', type: 'input',  props: { label: 'B' }, events: {} }
 
 function reset() {
-  const emptyApp = {
-    id: 'test',
-    name: 'Test',
-    components: [],
-    dataSources: [],
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  }
-  
-  useBuilderStore.setState((state) => ({
-    ...state,
-    app: emptyApp,
-    selectedId: null,
-    isDirty: false,
-    past: [],
-    future: [],
-  }))
+  useBuilderStore.getState().newApp()
+  useBuilderStore.setState({ past: [], future: [] }, false)
 }
 
 const store = () => useBuilderStore.getState()
 
-beforeEach(() => {
-  reset()
-})
+beforeEach(reset)
+
 
 describe('history recording', () => {
   it('addComponent pushes current app to past', () => {
     store().addComponent(c1)
-    expect(store().past.length).toBe(1)
+    expect(store().past).toHaveLength(1)
   })
 
   it('updateComponent pushes to past', () => {
     store().addComponent(c1)
     store().updateComponent('c1', { props: { text: 'Updated' } })
-    expect(store().past.length).toBe(2)
+    expect(store().past).toHaveLength(2)
   })
 
   it('removeComponent pushes to past', () => {
-    store().addComponent(c1)
+    useBuilderStore.setState((s) => ({ app: { ...s.app, components: [c1] } }))
     store().removeComponent('c1')
-    expect(store().past.length).toBe(1)
+    expect(store().past).toHaveLength(1)
   })
 
   it('reorderComponents pushes to past', () => {
-    store().addComponent(c1)
-    store().addComponent(c2)
+    useBuilderStore.setState((s) => ({ app: { ...s.app, components: [c1, c2] } }))
     store().reorderComponents([c2, c1])
-    expect(store().past.length).toBe(1)
+    expect(store().past).toHaveLength(1)
   })
 
   it('a new mutation after undo clears future', () => {
     store().addComponent(c1)
     store().undo()
-    expect(store().future.length).toBe(1)
-    store().addComponent(c2)
-    expect(store().future.length).toBe(0)
+    expect(store().future).toHaveLength(1)
+    store().addComponent({ ...c1, id: 'c2-new' })
+    expect(store().future).toHaveLength(0)
   })
 })
+
 
 describe('undo', () => {
   it('reverts the last component mutation', () => {
     store().addComponent(c1)
-    expect(store().app.components.length).toBe(1)
+    expect(store().app.components).toHaveLength(1)
     store().undo()
-    expect(store().app.components.length).toBe(0)
+    expect(store().app.components).toHaveLength(0)
   })
 
   it('moves current app to future', () => {
     store().addComponent(c1)
     store().undo()
-    expect(store().future.length).toBe(1)
+    expect(store().future).toHaveLength(1)
   })
 
   it('clears selectedId', () => {
@@ -96,25 +80,33 @@ describe('undo', () => {
     store().addComponent(c1)
     store().addComponent(c2)
     store().undo()
-    expect(store().app.components.length).toBe(1)
+    expect(store().app.components).toHaveLength(1)
     store().undo()
-    expect(store().app.components.length).toBe(0)
+    expect(store().app.components).toHaveLength(0)
+  })
+
+  it('cannot undo beyond the history cap', () => {
+    for (let i = 0; i < 52; i++) {
+      store().addComponent({ ...c1, id: `c${i}` })
+    }
+    expect(store().past.length).toBeLessThanOrEqual(50)
   })
 })
+
 
 describe('redo', () => {
   it('reapplies the undone state', () => {
     store().addComponent(c1)
     store().undo()
     store().redo()
-    expect(store().app.components.length).toBe(1)
+    expect(store().app.components).toHaveLength(1)
   })
 
   it('moves current app back to past', () => {
     store().addComponent(c1)
     store().undo()
     store().redo()
-    expect(store().past.length).toBe(1)
+    expect(store().past).toHaveLength(1)
   })
 
   it('clears selectedId', () => {
@@ -138,20 +130,20 @@ describe('redo', () => {
     store().undo()
     store().redo()
     store().redo()
-    expect(store().app.components.length).toBe(2)
-    expect(store().future.length).toBe(0)
+    expect(store().app.components).toHaveLength(2)
+    expect(store().future).toHaveLength(0)
   })
 })
 
+
 describe('duplicateComponent', () => {
   beforeEach(() => {
-    reset()
-    store().addComponent(c1)
+    useBuilderStore.setState((s) => ({ app: { ...s.app, components: [c1] } }))
   })
 
   it('appends a copy with a new id', () => {
     store().duplicateComponent('c1')
-    expect(store().app.components.length).toBe(2)
+    expect(store().app.components).toHaveLength(2)
     expect(store().app.components[1].id).not.toBe('c1')
   })
 
@@ -170,7 +162,7 @@ describe('duplicateComponent', () => {
 
   it('records history', () => {
     store().duplicateComponent('c1')
-    expect(store().past.length).toBe(1)
+    expect(store().past).toHaveLength(1)
   })
 
   it('is a no-op for an unknown id', () => {
@@ -180,27 +172,24 @@ describe('duplicateComponent', () => {
   })
 })
 
+
 describe('history cleared on load / new', () => {
   it('loadApp clears past and future', () => {
     store().addComponent(c1)
-    const newApp = {
-      id: 'x',
-      name: 'X',
-      components: [],
-      dataSources: [],
-      createdAt: 0,
-      updatedAt: 0,
-    }
-    store().loadApp(newApp)
-    expect(store().past.length).toBe(0)
-    expect(store().future.length).toBe(0)
+    store().loadApp({
+      id: 'x', name: 'X',
+      components: [], dataSources: [],
+      createdAt: 0, updatedAt: 0,
+    })
+    expect(store().past).toHaveLength(0)
+    expect(store().future).toHaveLength(0)
   })
 
   it('newApp clears past and future', () => {
     store().addComponent(c1)
     store().undo()
     store().newApp()
-    expect(store().past.length).toBe(0)
-    expect(store().future.length).toBe(0)
+    expect(store().past).toHaveLength(0)
+    expect(store().future).toHaveLength(0)
   })
 })

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { App, AppComponent as AppComponent, DataSource } from '../types'
+import type { App, AppComponent, DataSource } from '../types'
 
 const MAX_UNDO = 50
 
@@ -37,9 +37,9 @@ const emptyApp = (): App => ({
   createdAt: Date.now(), updatedAt: Date.now(),
 })
 
-
-function push(past: App[], app: App): App[] {
-  return [...past.slice(-MAX_UNDO), app]
+// FIXED: Push current app to past, then cap at MAX_UNDO
+function push(past: App[], currentApp: App): App[] {
+  return [...past, currentApp].slice(-MAX_UNDO)
 }
 
 export const useBuilderStore = create<BuilderStore>()(
@@ -56,8 +56,6 @@ export const useBuilderStore = create<BuilderStore>()(
 
       newApp: () =>
         set({ app: emptyApp(), selectedId: null, isDirty: false, past: [], future: [] }),
-
-      
 
       addComponent: (c) =>
         set((s) => ({
@@ -106,7 +104,7 @@ export const useBuilderStore = create<BuilderStore>()(
       duplicateComponent: (id) =>
         set((s) => {
           const src = s.app.components.find((c) => c.id === id)
-          if (!src) return s
+          if (!src) return {}
           const copy: AppComponent = { ...src, id: crypto.randomUUID() }
           return {
             past:       push(s.past, s.app),
@@ -120,8 +118,6 @@ export const useBuilderStore = create<BuilderStore>()(
             isDirty:    true,
           }
         }),
-
-      
 
       addDataSource: (ds) =>
         set((s) => ({
@@ -149,25 +145,23 @@ export const useBuilderStore = create<BuilderStore>()(
           isDirty: true,
         })),
 
-      
-
       undo: () =>
         set((s) => {
-          if (s.past.length === 0) return s
+          if (s.past.length === 0) return {}
           return {
             past:       s.past.slice(0, -1),
-            future:     [s.app, ...s.future],
+            future:     [s.app, ...s.future].slice(0, MAX_UNDO),
             app:        s.past[s.past.length - 1],
-            selectedId: null,  
+            selectedId: null,
             isDirty:    true,
           }
         }),
 
       redo: () =>
         set((s) => {
-          if (s.future.length === 0) return s
+          if (s.future.length === 0) return {}
           return {
-            past:       [...s.past, s.app],
+            past:       push(s.past, s.app),
             future:     s.future.slice(1),
             app:        s.future[0],
             selectedId: null,
@@ -179,7 +173,7 @@ export const useBuilderStore = create<BuilderStore>()(
     }),
     {
       name:       'itb-app',
-      partialize: (s) => ({ app: s.app }), 
+      partialize: (s) => ({ app: s.app }),
     },
   ),
 )
