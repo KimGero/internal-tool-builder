@@ -83,11 +83,11 @@ export function ChartWidget({ component, data: canvasData, runtime }: WidgetProp
   if (data.length === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50"
+        className="flex items-center justify-center rounded-lg border border-dashed border-[var(--sh-b)] bg-[var(--sh-s)]"
         style={{ height }}
         aria-label="Empty chart"
       >
-        <p className="text-sm text-gray-400">Connect a data source to see your chart</p>
+        <p className="text-sm text-[var(--sh-td)]">Connect a data source to see your chart</p>
       </div>
     )
   }

@@ -21,13 +21,13 @@ type FieldValues = Record<string, string>
 
 const fieldClass = (hasError: boolean) =>
   clsx(
-    'w-full rounded-md border px-3 py-2 text-sm text-gray-900 shadow-sm',
-    'placeholder:text-gray-400',
+    'w-full rounded-md border px-3 py-2 text-sm text-[var(--sh-ts)] shadow-sm',
+    'placeholder:text-[var(--sh-td)]',
     'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
     'transition-colors',
     hasError
       ? 'border-red-400 bg-red-50 focus:border-red-400 focus:ring-red-400/20'
-      : 'border-gray-300 bg-white',
+      : 'border-gray-300 bg-[var(--sh)]',
   )
 
 
@@ -151,7 +151,7 @@ export function FormWidget({ component, runtime, onEvent }: WidgetProps) {
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4"
+      className="flex flex-col gap-4 rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] p-4"
     >
       {fields.map(field => {
         const error = errors[field.name]
@@ -159,7 +159,7 @@ export function FormWidget({ component, runtime, onEvent }: WidgetProps) {
           <div key={field.name} className="flex flex-col gap-1.5">
             <label
               htmlFor={`${component.id}-${field.name}`}
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-[var(--sh-ts)]"
             >
               {field.label}
               {field.required && (
@@ -198,8 +198,8 @@ export function FormWidget({ component, runtime, onEvent }: WidgetProps) {
             type="button"
             onClick={handleReset}
             className={clsx(
-              'rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
-              'hover:bg-gray-50 transition-colors',
+              'rounded-md border border-gray-300 bg-[var(--sh)] px-4 py-2 text-sm font-medium text-[var(--sh-ts)]',
+              'hover:bg-[var(--sh-s)] transition-colors',
               'focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2',
             )}
           >

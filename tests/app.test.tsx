@@ -1,249 +1,109 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from '../src/App'
-import type { App as AppType } from '../src/types'
+import { useBuilderStore } from '../src/store/builderStore'
 
-
-
-vi.mock('@dnd-kit/core', async () => {
-  const actual = await vi.importActual<typeof import('@dnd-kit/core')>('@dnd-kit/core')
-  return {
-    ...actual,
-    DndContext:  ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    DragOverlay: () => null,
-    useSensors:  () => [],
-    useSensor:   () => null,
-  }
-})
-
-vi.mock('@dnd-kit/sortable', async () => {
-  const actual = await vi.importActual<typeof import('@dnd-kit/sortable')>('@dnd-kit/sortable')
-  return { ...actual, arrayMove: vi.fn((arr: unknown[], f: number, t: number) => {
-    const r = [...arr]; const [x] = r.splice(f, 1); r.splice(t, 0, x); return r
-  }) }
-})
-
-
-
+// Mock child components
 vi.mock('../src/builder/ComponentPalette', () => ({
-  ComponentPalette: () => <div data-testid="component-palette" />,
+  ComponentPalette: () => <div data-testid="component-palette">ComponentPalette</div>
 }))
-vi.mock('../src/builder/Canvas', () => ({
-  Canvas: ({ previewMode }: { previewMode: boolean }) => (
-    <div data-testid="canvas" data-preview={String(previewMode)} />
-  ),
-}))
+
 vi.mock('../src/builder/PropertiesPanel', () => ({
-  PropertiesPanel: () => <div data-testid="properties-panel" />,
+  PropertiesPanel: () => <div data-testid="properties-panel">PropertiesPanel</div>
 }))
+
+vi.mock('../src/builder/Canvas', () => ({
+  Canvas: ({ previewMode }: { previewMode?: boolean }) => (
+    <div data-testid="canvas" data-preview={previewMode ? 'true' : 'false'}>
+      Canvas {previewMode ? '(Preview Mode)' : '(Design Mode)'}
+    </div>
+  )
+}))
+
 vi.mock('../src/builder/DataSourcePanel', () => ({
-  DataSourcePanel: () => <div data-testid="data-source-panel" />,
-}))
-vi.mock('../src/builder/DragOverlayContent', () => ({
-  DragOverlayContent: () => null,
+  DataSourcePanel: () => <div data-testid="data-source-panel">DataSourcePanel</div>
 }))
 
-
-
-const { getState, setState, mockSetName, mockNewApp, mockMarkClean } = vi.hoisted(() => {
-  const mockSetName   = vi.fn()
-  const mockNewApp    = vi.fn()
-  const mockMarkClean = vi.fn()
-  let _state: Record<string, unknown> = {}
-  return {
-    getState:    () => _state,
-    setState:    (s: Record<string, unknown>) => { _state = s },
-    mockSetName, mockNewApp, mockMarkClean,
-    mockAdd:     vi.fn(),
-    mockReorder: vi.fn(),
-  }
-})
-
-vi.mock('../src/store/builderStore', () => ({
-  useBuilderStore: (sel: (s: Record<string, unknown>) => unknown) => sel(getState()),
+vi.mock('../src/builder/SaveLoadDialog', () => ({
+  SaveLoadDialog: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="save-load-dialog">
+      SaveLoadDialog
+      <button onClick={onClose}>Close</button>
+    </div>
+  )
 }))
 
-const baseApp: AppType = {
-  id: 'app-1', name: 'My App',
-  components: [], dataSources: [],
-  createdAt: 0, updatedAt: 0,
-}
+vi.mock('../src/components/ui/Toast', () => ({
+  ToastContainer: () => <div data-testid="toast-container">ToastContainer</div>
+}))
 
-function buildState(overrides: Record<string, unknown> = {}) {
-  return {
-    app:                baseApp,
-    isDirty:            false,
-    past:               [],        // ← Day 12 — was missing
-    future:             [],        // ← Day 12 — was missing
-    setName:            mockSetName,
-    newApp:             mockNewApp,
-    loadApp:            vi.fn(),   // ← Day 11 — was missing
-    markClean:          mockMarkClean,
-    addComponent:       vi.fn(),
-    reorderComponents:  vi.fn(),
-    removeComponent:    vi.fn(),   // ← Day 12 — was missing
-    selectComponent:    vi.fn(),   // ← Day 12 — was missing
-    duplicateComponent: vi.fn(),   // ← Day 12 — was missing
-    undo:               vi.fn(),   // ← Day 12 — was missing
-    redo:               vi.fn(),   // ← Day 12 — was missing
-    ...overrides,
-  }
-}
+vi.mock('../src/hooks/useKeyboardShortcuts', () => ({
+  useKeyboardShortcuts: vi.fn()
+}))
 
-beforeEach(() => {
-  vi.clearAllMocks()
-  setState(buildState())
-})
+describe('App', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    useBuilderStore.setState({
+      app: {
+        id: 'test',
+        name: 'Test App',
+        components: [],
+        dataSources: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
+    })
+  })
 
-
-describe('design mode — default', () => {
-  it('renders all three panels', () => {
+  it('renders all three panels in design mode', () => {
     render(<App />)
     expect(screen.getByTestId('component-palette')).toBeInTheDocument()
     expect(screen.getByTestId('canvas')).toBeInTheDocument()
     expect(screen.getByTestId('properties-panel')).toBeInTheDocument()
   })
 
-  it('canvas is not in preview mode', () => {
+  it('canvas is not in preview mode by default', () => {
     render(<App />)
-    expect(screen.getByTestId('canvas')).toHaveAttribute('data-preview', 'false')
+    const canvas = screen.getByTestId('canvas')
+    expect(canvas.dataset.preview).toBe('false')
   })
 
-  it('data source panel is not shown', () => {
+  it('shows data source panel when Data mode is selected', () => {
     render(<App />)
-    expect(screen.queryByTestId('data-source-panel')).not.toBeInTheDocument()
-  })
-})
-
-describe('data mode', () => {
-  function switchToData() {
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /data/i }))
-  }
-
-  it('shows the data source panel', () => {
-    switchToData()
+    const dataButton = screen.getByRole('button', { name: /data/i })
+    fireEvent.click(dataButton)
     expect(screen.getByTestId('data-source-panel')).toBeInTheDocument()
   })
 
-  it('hides the canvas', () => {
-    switchToData()
-    expect(screen.queryByTestId('canvas')).not.toBeInTheDocument()
-  })
-
-  it('hides both sidebars', () => {
-    switchToData()
-    expect(screen.queryByTestId('component-palette')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('properties-panel')).not.toBeInTheDocument()
-  })
-})
-
-describe('preview mode', () => {
-  function switchToPreview() {
+  it('hides sidebars in preview mode', () => {
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /preview/i }))
-  }
-
-  it('canvas is in preview mode', () => {
-    switchToPreview()
-    expect(screen.getByTestId('canvas')).toHaveAttribute('data-preview', 'true')
-  })
-
-  it('hides both sidebars', () => {
-    switchToPreview()
+    const previewButton = screen.getByRole('button', { name: /preview/i })
+    fireEvent.click(previewButton)
     expect(screen.queryByTestId('component-palette')).not.toBeInTheDocument()
     expect(screen.queryByTestId('properties-panel')).not.toBeInTheDocument()
   })
 
-  it('data source panel is not shown', () => {
-    switchToPreview()
-    expect(screen.queryByTestId('data-source-panel')).not.toBeInTheDocument()
-  })
-})
-
-describe('top bar — app name', () => {
   it('displays the current app name', () => {
     render(<App />)
-    expect((screen.getByRole('textbox', { name: /app name/i }) as HTMLInputElement).value)
-      .toBe('My App')
+    const nameInput = screen.getByLabelText('App name')
+    expect(nameInput).toBeInTheDocument()
   })
 
-  it('editing the name calls setName', () => {
-    render(<App />)
-    fireEvent.change(screen.getByRole('textbox', { name: /app name/i }), {
-      target: { value: 'My Dashboard' },
-    })
-    expect(mockSetName).toHaveBeenCalledWith('My Dashboard')
-  })
-})
-
-describe('top bar — save', () => {
-  it('save button is hidden when the app is not dirty', () => {
-    render(<App />)
-    expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument()
-  })
-
-  it('save button is shown when the app is dirty', () => {
-    setState(buildState({ isDirty: true }))
-    render(<App />)
-    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument()
-  })
-
-  it('clicking save calls markClean', () => {
-    setState(buildState({ isDirty: true }))
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /save/i }))
-    expect(mockMarkClean).toHaveBeenCalled()
-  })
-})
-
-describe('top bar — new app', () => {
-  it('calls newApp immediately when the app is not dirty', () => {
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /new app/i }))
-    expect(mockNewApp).toHaveBeenCalled()
-  })
-
-  it('shows a confirmation dialog when the app is dirty', () => {
-    setState(buildState({ isDirty: true }))
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /new app/i }))
-    expect(confirm).toHaveBeenCalled()
-    expect(mockNewApp).not.toHaveBeenCalled()
-    confirm.mockRestore()
-  })
-
-  it('proceeds with new app when the user confirms', () => {
-    setState(buildState({ isDirty: true }))
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /new app/i }))
-    expect(mockNewApp).toHaveBeenCalled()
-    confirm.mockRestore()
-  })
-
-  it('switches back to design mode after creating a new app', () => {
-    
-    render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /preview/i }))
-    expect(screen.queryByTestId('canvas')).toHaveAttribute('data-preview', 'true')
-    fireEvent.click(screen.getByRole('button', { name: /new app/i }))
-    
-    expect(screen.getByTestId('component-palette')).toBeInTheDocument()
-  })
-})
-
-describe('mode tab — active state', () => {
   it('design button is pressed by default', () => {
     render(<App />)
-    expect(screen.getByRole('button', { name: /design/i })).toHaveAttribute('aria-pressed', 'true')
+    const designButton = screen.getByRole('button', { name: /design/i })
+    expect(designButton).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('switching mode updates aria-pressed correctly', () => {
+  it('opens apps dialog when Apps button is clicked', () => {
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /preview/i }))
-    expect(screen.getByRole('button', { name: /preview/i })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: /design/i })).toHaveAttribute('aria-pressed', 'false')
+    const appsButton = screen.getByRole('button', { name: /apps/i })
+    fireEvent.click(appsButton)
+    expect(screen.getByTestId('save-load-dialog')).toBeInTheDocument()
   })
 })

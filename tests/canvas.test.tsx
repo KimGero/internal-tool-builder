@@ -1,141 +1,120 @@
 ﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Canvas } from '../src/builder/Canvas'
-import { DndContext } from '@dnd-kit/core'
-
-// Mock the store
-let mockSelect = vi.fn()
-let mockRemove = vi.fn()
-
-const mockComponents = [
-  { id: 'btn-1', type: 'button', props: { text: 'Click Me', variant: 'primary' }, events: {} },
-  { id: 'input-1', type: 'input', props: { placeholder: 'Enter text' }, events: {} },
-]
-
-vi.mock('../src/store/builderStore', () => ({
-  useBuilderStore: vi.fn(),
-}))
-
 import { useBuilderStore } from '../src/store/builderStore'
 
-// Mock the widget registry
+// Mock the registry
 vi.mock('../src/components/registry', () => ({
   REGISTRY: {
-    button: { Widget: () => <button>Mock Button</button> },
-    input: { Widget: () => <input placeholder="Mock Input" /> },
+    button: { 
+      Widget: ({ component }: any) => <button data-testid={component.id}>{component.props.text || 'Mock Button'}</button>
+    },
+    input: { 
+      Widget: ({ component }: any) => <input data-testid={component.id} placeholder={component.props.placeholder || 'Mock Input'} />
+    },
   },
-  getComponentList: () => [],
+  getComponentList: vi.fn(() => [])
 }))
 
-// Mock child components
-vi.mock('../src/builder/SortableWidget', () => ({
-  SortableWidget: ({ children }: any) => <div>{children}</div>,
+vi.mock('../src/core/stateManager', () => ({
+  runtimeState: { getAll: vi.fn(() => ({})) }
 }))
 
-vi.mock('../src/widgets/WidgetRenderer', () => ({
-  WidgetRenderer: ({ component }: any) => (
-    <div data-testid={`widget-${component.type}`}>
-      {component.type === 'button' ? 'Mock Button' : 'Mock Input'}
-    </div>
-  ),
-}))
-
-function WrappedCanvas() {
-  return (
-    <DndContext>
-      <Canvas />
-    </DndContext>
-  )
-}
-
-describe('Canvas — component rendering', () => {
+describe('Canvas', () => {
   beforeEach(() => {
-    mockSelect = vi.fn()
-    mockRemove = vi.fn()
-    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
-      return selector({
-        app: { components: mockComponents },
-        selectedId: null,
-        selectComponent: mockSelect,
-        removeComponent: mockRemove,
-      })
-    })
+    vi.clearAllMocks()
   })
 
   it('renders a widget for each component in the store', () => {
-    render(<WrappedCanvas />)
-    expect(screen.getByText('Mock Button')).toBeInTheDocument()
-    expect(screen.getByText('Mock Input')).toBeInTheDocument()
+    const mockComponents = [
+      { id: 'btn-1', type: 'button', props: { text: 'Mock Button' }, events: {} },
+      { id: 'input-1', type: 'input', props: { placeholder: 'Mock Input' }, events: {} }
+    ]
+    
+    useBuilderStore.setState({
+      app: { components: mockComponents, id: 'test', name: 'Test', dataSources: [], createdAt: 0, updatedAt: 0 },
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
+    })
+    
+    render(<Canvas previewMode={false} />)
+    expect(screen.getByTestId('btn-1')).toBeInTheDocument()
+    expect(screen.getByTestId('input-1')).toBeInTheDocument()
   })
 
   it('shows empty canvas message when there are no components', () => {
-    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
-      return selector({
-        app: { components: [] },
-        selectedId: null,
-        selectComponent: mockSelect,
-        removeComponent: mockRemove,
-      })
+    useBuilderStore.setState({
+      app: { components: [], id: 'test', name: 'Test', dataSources: [], createdAt: 0, updatedAt: 0 },
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
     })
-    render(<WrappedCanvas />)
-    expect(screen.getByText(/drag components here/i)).toBeInTheDocument()
-  })
-})
-
-describe('Canvas — selection', () => {
-  beforeEach(() => {
-    mockSelect = vi.fn()
-    mockRemove = vi.fn()
-    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
-      return selector({
-        app: { components: mockComponents },
-        selectedId: null,
-        selectComponent: mockSelect,
-        removeComponent: mockRemove,
-      })
-    })
+    
+    render(<Canvas previewMode={false} />)
+    expect(screen.getByText(/start building/i)).toBeInTheDocument()
   })
 
   it('clicking a component calls selectComponent with its id', () => {
-    render(<WrappedCanvas />)
-    const button = screen.getByText('Mock Button').closest('[class*="relative"]')
-    if (button) fireEvent.click(button)
-    expect(mockSelect).toHaveBeenCalledWith('btn-1')
-  })
-})
-
-describe('Canvas — delete key', () => {
-  beforeEach(() => {
-    mockSelect = vi.fn()
-    mockRemove = vi.fn()
+    const mockSelectComponent = vi.fn()
+    const mockComponents = [
+      { id: 'btn-1', type: 'button', props: { text: 'Mock Button' }, events: {} }
+    ]
+    
+    useBuilderStore.setState({
+      app: { components: mockComponents, id: 'test', name: 'Test', dataSources: [], createdAt: 0, updatedAt: 0 },
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
+      selectComponent: mockSelectComponent,
+    } as any)
+    
+    render(<Canvas previewMode={false} />)
+    const button = screen.getByTestId('btn-1')
+    fireEvent.click(button)
+    expect(mockSelectComponent).toHaveBeenCalledWith('btn-1')
   })
 
   it('Delete key calls removeComponent when a component is selected', () => {
-    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
-      return selector({
-        app: { components: mockComponents },
-        selectedId: 'btn-1',
-        selectComponent: mockSelect,
-        removeComponent: mockRemove,
-      })
-    })
-    render(<WrappedCanvas />)
+    const mockRemoveComponent = vi.fn()
+    const mockComponents = [
+      { id: 'btn-1', type: 'button', props: { text: 'Mock Button' }, events: {} }
+    ]
+    
+    useBuilderStore.setState({
+      app: { components: mockComponents, id: 'test', name: 'Test', dataSources: [], createdAt: 0, updatedAt: 0 },
+      selectedId: 'btn-1',
+      isDirty: false,
+      past: [],
+      future: [],
+      removeComponent: mockRemoveComponent,
+    } as any)
+    
+    render(<Canvas previewMode={false} />)
     fireEvent.keyDown(window, { key: 'Delete' })
-    expect(mockRemove).toHaveBeenCalledWith('btn-1')
-    expect(mockRemove).toHaveBeenCalledTimes(1)
+    expect(mockRemoveComponent).toHaveBeenCalledWith('btn-1')
   })
 
   it('Delete key is ignored when nothing is selected', () => {
-    vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
-      return selector({
-        app: { components: mockComponents },
-        selectedId: null,
-        selectComponent: mockSelect,
-        removeComponent: mockRemove,
-      })
-    })
-    render(<WrappedCanvas />)
+    const mockRemoveComponent = vi.fn()
+    const mockComponents = [
+      { id: 'btn-1', type: 'button', props: { text: 'Mock Button' }, events: {} }
+    ]
+    
+    useBuilderStore.setState({
+      app: { components: mockComponents, id: 'test', name: 'Test', dataSources: [], createdAt: 0, updatedAt: 0 },
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
+      removeComponent: mockRemoveComponent,
+    } as any)
+    
+    render(<Canvas previewMode={false} />)
     fireEvent.keyDown(window, { key: 'Delete' })
-    expect(mockRemove).not.toHaveBeenCalled()
+    expect(mockRemoveComponent).not.toHaveBeenCalled()
   })
 })

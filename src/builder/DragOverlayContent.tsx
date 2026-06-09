@@ -18,7 +18,7 @@ export function DragOverlayContent({ active }: Props) {
   return (
     <div className={clsx(
       'flex items-center gap-2.5 px-3 py-2.5 rounded-md shadow-lg',
-      'bg-white border border-blue-300 text-blue-700 text-sm font-medium',
+      'bg-[var(--sh)] border border-blue-300 text-blue-700 text-sm font-medium',
       'cursor-grabbing select-none pointer-events-none',
     )}>
       {entry.label}

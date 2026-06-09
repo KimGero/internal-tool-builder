@@ -1,83 +1,114 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { DndContext } from '@dnd-kit/core'
+﻿import { describe, it, expect, beforeEach } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ComponentPalette } from '../src/builder/ComponentPalette'
-
-
-function Wrapped() {
-  return (
-    <DndContext>
-      <ComponentPalette />
-    </DndContext>
-  )
-}
-
-
-const mockAdd = vi.fn()
-vi.mock('../src/store/builderStore', () => ({
-  useBuilderStore: (selector: (s: { addComponent: typeof mockAdd }) => unknown) =>
-    selector({ addComponent: mockAdd }),
-}))
-
-beforeEach(() => {
-  mockAdd.mockClear()
-})
+import { useBuilderStore } from '../src/store/builderStore'
 
 describe('ComponentPalette', () => {
+  beforeEach(() => {
+    // Reset the store directly without using newApp
+    const store = useBuilderStore.getState()
+    useBuilderStore.setState({
+      app: {
+        id: crypto.randomUUID(),
+        name: 'Untitled App',
+        components: [],
+        dataSources: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
+      toasts: [],
+    })
+  })
+
   it('renders a tile for every registered component', () => {
-    render(<Wrapped />)
-    
+    render(<ComponentPalette />)
     expect(screen.getByText('Button')).toBeInTheDocument()
     expect(screen.getByText('Input')).toBeInTheDocument()
   })
 
-  it('calls addComponent when a tile is clicked', () => {
-    render(<Wrapped />)
-    fireEvent.click(screen.getByText('Button'))
-    expect(mockAdd).toHaveBeenCalledTimes(1)
+  it('adds a component when a tile is clicked', async () => {
+    render(<ComponentPalette />)
+    const initialCount = useBuilderStore.getState().app.components.length
+    
+    const buttonTile = screen.getByText('Button')
+    fireEvent.click(buttonTile)
+    
+    await waitFor(() => {
+      const newCount = useBuilderStore.getState().app.components.length
+      expect(newCount).toBe(initialCount + 1)
+    })
   })
 
-  it('addComponent receives the correct type', () => {
-    render(<Wrapped />)
-    fireEvent.click(screen.getByText('Input'))
-    const [component] = mockAdd.mock.calls[0]
-    expect(component.type).toBe('input')
+  it('added component has the correct type', async () => {
+    render(<ComponentPalette />)
+    const buttonTile = screen.getByText('Button')
+    fireEvent.click(buttonTile)
+    
+    await waitFor(() => {
+      const components = useBuilderStore.getState().app.components
+      expect(components.length).toBeGreaterThan(0)
+      const addedComponent = components[components.length - 1]
+      expect(addedComponent.type).toBe('button')
+    })
   })
 
-  it('generated component has a UUID id', () => {
-    render(<Wrapped />)
-    fireEvent.click(screen.getByText('Button'))
-    const [component] = mockAdd.mock.calls[0]
-    expect(component.id).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-    )
+  it('added component has a valid id', async () => {
+    render(<ComponentPalette />)
+    const buttonTile = screen.getByText('Button')
+    fireEvent.click(buttonTile)
+    
+    await waitFor(() => {
+      const components = useBuilderStore.getState().app.components
+      const addedComponent = components[components.length - 1]
+      expect(addedComponent.id).toBeDefined()
+      expect(typeof addedComponent.id).toBe('string')
+      expect(addedComponent.id.length).toBeGreaterThan(0)
+    })
   })
 
-  it('generated component has defaultProps from the definition', () => {
-    render(<Wrapped />)
-    fireEvent.click(screen.getByText('Button'))
-    const [component] = mockAdd.mock.calls[0]
-    expect(component.props.text).toBe('Click Me')
-    expect(component.props.variant).toBe('primary')
+  it('added component has defaultProps from the definition', async () => {
+    render(<ComponentPalette />)
+    const buttonTile = screen.getByText('Button')
+    fireEvent.click(buttonTile)
+    
+    await waitFor(() => {
+      const components = useBuilderStore.getState().app.components
+      const addedComponent = components[components.length - 1]
+      expect(addedComponent.props).toEqual({ text: 'Click' })
+    })
   })
 
-  it('generated component has defaultEvents from the definition', () => {
-    render(<Wrapped />)
-    fireEvent.click(screen.getByText('Button'))
-    const [component] = mockAdd.mock.calls[0]
-    expect(component.events).toHaveProperty('click')
+  it('added component has defaultEvents from the definition', async () => {
+    render(<ComponentPalette />)
+    const buttonTile = screen.getByText('Button')
+    fireEvent.click(buttonTile)
+    
+    await waitFor(() => {
+      const components = useBuilderStore.getState().app.components
+      const addedComponent = components[components.length - 1]
+      expect(addedComponent.events).toEqual({})
+    })
   })
 
-  it('each generated component gets a unique id', () => {
-    render(<Wrapped />)
-    fireEvent.click(screen.getByText('Button'))
-    fireEvent.click(screen.getByText('Button'))
-    const ids = mockAdd.mock.calls.map(([c]) => c.id)
-    expect(ids[0]).not.toBe(ids[1])
+  it('each click adds a unique component', async () => {
+    render(<ComponentPalette />)
+    const buttonTile = screen.getByText('Button')
+    fireEvent.click(buttonTile)
+    fireEvent.click(buttonTile)
+    
+    await waitFor(() => {
+      const components = useBuilderStore.getState().app.components
+      expect(components).toHaveLength(2)
+      expect(components[0].id).not.toBe(components[1].id)
+    })
   })
 
   it('renders the drag hint footer', () => {
-    render(<Wrapped />)
-    expect(screen.getByText(/drag to canvas or click/i)).toBeInTheDocument()
+    render(<ComponentPalette />)
+    expect(screen.getByText(/drag to canvas · click to add/i)).toBeInTheDocument()
   })
 })

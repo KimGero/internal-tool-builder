@@ -93,25 +93,25 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
         className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
       >
         <div
-          className="w-full max-w-lg bg-white rounded-xl shadow-xl
+          className="w-full max-w-lg bg-[var(--sh)] rounded-xl shadow-xl
             flex flex-col max-h-[80vh] pointer-events-auto"
           onClick={e => e.stopPropagation()}
         >
 
           
           <div className="flex items-center justify-between px-5 py-4
-            border-b border-gray-200 shrink-0">
+            border-b border-[var(--sh-b)] shrink-0">
             <div>
-              <h2 className="text-base font-semibold text-gray-900">Apps</h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <h2 className="text-base font-semibold text-[var(--sh-ts)]">Apps</h2>
+              <p className="text-xs text-[var(--sh-t)] mt-0.5">
                 Save, load, or transfer your apps
               </p>
             </div>
             <button
               aria-label="Close"
               onClick={onClose}
-              className="p-1.5 rounded text-gray-400
-                hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded text-[var(--sh-td)]
+                hover:bg-[var(--sh-b2)] transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -119,7 +119,7 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
 
           
           <div className="flex items-center gap-2 px-5 py-3
-            border-b border-gray-100 bg-gray-50 shrink-0">
+            border-b border-[var(--sh-b)] bg-[var(--sh-s)] shrink-0">
             <button
               onClick={handleSave}
               className="px-3 py-1.5 text-xs font-medium text-white
@@ -131,8 +131,8 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
             <button
               onClick={handleExport}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                text-gray-700 border border-gray-200 rounded
-                hover:bg-gray-100 transition-colors"
+                text-[var(--sh-ts)] border border-[var(--sh-b)] rounded
+                hover:bg-[var(--sh-b2)] transition-colors"
             >
               <Download className="w-3.5 h-3.5" aria-hidden="true" />
               Export JSON
@@ -142,8 +142,8 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
               onClick={() => fileRef.current?.click()}
               disabled={importing}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                text-gray-700 border border-gray-200 rounded
-                hover:bg-gray-100 transition-colors
+                text-[var(--sh-ts)] border border-[var(--sh-b)] rounded
+                hover:bg-[var(--sh-b2)] transition-colors
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload className="w-3.5 h-3.5" aria-hidden="true" />
@@ -174,8 +174,8 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
               <div className="flex flex-col items-center justify-center
                 py-12 text-center">
                 <FolderOpen className="w-8 h-8 text-gray-300 mb-2" aria-hidden="true" />
-                <p className="text-sm text-gray-500">No saved apps yet</p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-sm text-[var(--sh-t)]">No saved apps yet</p>
+                <p className="text-xs text-[var(--sh-td)] mt-1">
                   Click "Save current app" to create your first snapshot
                 </p>
               </div>
@@ -185,19 +185,19 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
                   <li
                     key={meta.id}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg
-                      border border-gray-200 hover:border-gray-300
-                      hover:bg-gray-50 transition-colors group"
+                      border border-[var(--sh-b)] hover:border-gray-300
+                      hover:bg-[var(--sh-s)] transition-colors group"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-[var(--sh-ts)] truncate">
                         {meta.name}
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <span className="flex items-center gap-1 text-xs text-[var(--sh-td)]">
                           <Clock className="w-3 h-3" aria-hidden="true" />
                           {formatDate(meta.savedAt)}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <span className="flex items-center gap-1 text-xs text-[var(--sh-td)]">
                           <Layers className="w-3 h-3" aria-hidden="true" />
                           {meta.componentCount}{' '}
                           {meta.componentCount === 1 ? 'component' : 'components'}
@@ -217,7 +217,7 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
                       <button
                         aria-label={`Delete ${meta.name}`}
                         onClick={() => handleDelete(meta.id)}
-                        className="p-1.5 rounded text-gray-400
+                        className="p-1.5 rounded text-[var(--sh-td)]
                           hover:bg-red-50 hover:text-red-500 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -230,8 +230,8 @@ export function SaveLoadDialog({ currentApp, onLoad, onClose }: Props) {
           </div>
 
           
-          <div className="px-5 py-3 border-t border-gray-100 shrink-0">
-            <p className="text-xs text-gray-400 text-center">
+          <div className="px-5 py-3 border-t border-[var(--sh-b)] shrink-0">
+            <p className="text-xs text-[var(--sh-td)] text-center">
               Snapshots are stored in your browser.
               Use Export / Import to move apps between devices.
             </p>

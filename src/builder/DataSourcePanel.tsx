@@ -20,10 +20,10 @@ type TestState =
 const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const
 
 const fieldClass =
-  'w-full rounded-md border border-gray-200 px-2.5 py-1.5 text-sm bg-white ' +
-  'focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/30'
+  'w-full rounded-md border border-[var(--sh-b)] px-2.5 py-1.5 text-sm bg-[var(--sh)] ' +
+  'focus:outline-none focus:border-[var(--ac)]/60 focus:ring-1 focus:ring-blue-400/30'
 
-const labelClass = 'block text-xs font-medium text-gray-600 mb-1'
+const labelClass = 'block text-xs font-medium text-[var(--sh-t)] mb-1'
 
 const empty = (): EditingDS => ({
   name: '', type: 'rest', url: '', method: 'GET',
@@ -39,22 +39,22 @@ interface SourceCardProps {
 
 function SourceCard({ source, onEdit, onDelete }: SourceCardProps) {
   return (
-    <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2.5">
+    <div className="flex items-center gap-2 rounded-md border border-[var(--sh-b)] bg-[var(--sh)] px-3 py-2.5">
       <div className="flex-1 min-w-0">
         <p className="truncate text-sm font-medium text-gray-800">{source.name}</p>
-        <p className="text-xs uppercase text-gray-400">{source.type}</p>
+        <p className="text-xs uppercase text-[var(--sh-td)]">{source.type}</p>
       </div>
       <button
         aria-label={`Edit ${source.name}`}
         onClick={onEdit}
-        className="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 transition-colors"
+        className="rounded px-2 py-1 text-xs text-[var(--sh-t)] hover:bg-[var(--sh-b2)] transition-colors"
       >
         Edit
       </button>
       <button
         aria-label={`Delete ${source.name}`}
         onClick={onDelete}
-        className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+        className="rounded p-1.5 text-[var(--sh-td)] hover:bg-red-50 hover:text-red-500 transition-colors"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
@@ -86,9 +86,9 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
     <div
       role="form"
       aria-label="Data source form"
-      className="flex flex-col gap-3 border-t border-gray-100 bg-gray-50/50 px-4 py-3"
+      className="flex flex-col gap-3 border-t border-[var(--sh-b)] bg-[var(--sh-s)]/50 px-4 py-3"
     >
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+      <p className="text-xs font-semibold text-[var(--sh-t)] uppercase tracking-wider">
         {editing.id ? 'Edit source' : 'New source'}
       </p>
 
@@ -105,7 +105,7 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         />
       </div>
 
-      {/* Type */}
+      /* Type */
       <div>
         <label className={labelClass}>Type</label>
         <select
@@ -145,7 +145,7 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
           </div>
           <div>
             <label className={labelClass}>
-              Headers <span className="text-gray-400">(JSON)</span>
+              Headers <span className="text-[var(--sh-td)]">(JSON)</span>
             </label>
             <textarea
               aria-label="HTTP headers"
@@ -177,7 +177,7 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
       {editing.type === 'javascript' && (
         <div>
           <label className={labelClass}>
-            Code <span className="text-gray-400">(return an array)</span>
+            Code <span className="text-[var(--sh-td)]">(return an array)</span>
           </label>
           <textarea
             aria-label="JavaScript code"
@@ -191,9 +191,9 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         </div>
       )}
 
-      {/* Cache TTL */}
+      /* Cache TTL */
       <div>
-        <label className={labelClass}>Cache TTL <span className="text-gray-400">(ms)</span></label>
+        <label className={labelClass}>Cache TTL <span className="text-[var(--sh-td)]">(ms)</span></label>
         <input
           type="number"
           aria-label="Cache TTL in milliseconds"
@@ -205,7 +205,7 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         />
       </div>
 
-      {/* Save / Cancel */}
+      /* Save / Cancel */
       <div className="flex gap-2">
         <button
           aria-label="Save data source"
@@ -218,18 +218,18 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         <button
           aria-label="Cancel"
           onClick={onCancel}
-          className="flex-1 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex-1 rounded-md border border-[var(--sh-b)] bg-[var(--sh)] px-3 py-1.5 text-sm font-medium text-[var(--sh-ts)] hover:bg-[var(--sh-s)] transition-colors"
         >
           Cancel
         </button>
       </div>
 
-      {/* Test */}
+      /* Test */
       <button
         aria-label="Test data source"
         onClick={onTest}
         disabled={!canSave || testing}
-        className="flex w-full items-center justify-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="flex w-full items-center justify-center gap-1.5 rounded-md border border-[var(--sh-b)] px-3 py-1.5 text-sm font-medium text-[var(--sh-ts)] hover:bg-[var(--sh-s)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {testing
           ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />Running…</>
@@ -237,7 +237,7 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         }
       </button>
 
-      {/* Test result */}
+      /* Test result */
       {testState.status === 'success' && (
         <div className="rounded-md border border-green-200 bg-green-50 overflow-hidden" role="status">
           <div className="flex items-center gap-1.5 border-b border-green-200 px-3 py-2 text-sm font-medium text-green-700">
@@ -305,10 +305,10 @@ export function DataSourcePanel() {
   return (
     <div
       aria-label="Data sources panel"
-      className="flex flex-col rounded-lg border border-gray-200 bg-white overflow-hidden"
+      className="flex flex-col rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] overflow-hidden"
     >
-      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-3">
-        <h2 className="text-sm font-semibold text-gray-700">Data Sources</h2>
+      <div className="flex items-center justify-between border-b border-[var(--sh-b)] bg-[var(--sh-s)] px-4 py-3">
+        <h2 className="text-sm font-semibold text-[var(--sh-ts)]">Data Sources</h2>
         <button
           aria-label="Add data source"
           onClick={openNew}
@@ -321,7 +321,7 @@ export function DataSourcePanel() {
 
       <div className="flex flex-col gap-1.5 p-3">
         {dataSources.length === 0 && !editing && (
-          <p className="py-4 text-center text-sm text-gray-400">No data sources yet.</p>
+          <p className="py-4 text-center text-sm text-[var(--sh-td)]">No data sources yet.</p>
         )}
         {dataSources.map(ds => (
           <SourceCard

@@ -6,9 +6,9 @@ import type { WidgetProps } from './registry';
 
 const VARIANTS: Record<string, string> = {
   primary:   'bg-blue-600 text-white border-blue-600 hover:bg-blue-700',
-  secondary: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+  secondary: 'bg-[var(--sh)] text-[var(--sh-ts)] border-gray-300 hover:bg-[var(--sh-s)]',
   danger:    'bg-red-600 text-white border-red-600 hover:bg-red-700',
-  ghost:     'bg-transparent text-gray-700 border-transparent hover:bg-gray-100',
+  ghost:     'bg-transparent text-[var(--sh-ts)] border-transparent hover:bg-[var(--sh-b2)]',
 };
 
 export function ButtonWidget({ component, runtime, onEvent }: WidgetProps) {

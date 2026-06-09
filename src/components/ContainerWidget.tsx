@@ -33,19 +33,19 @@ export function ContainerWidget({
   return (
     <div className={clsx(
       'rounded-lg overflow-hidden w-full',
-      bordered && 'border border-gray-200',
+      bordered && 'border border-[var(--sh-b)]',
     )}>
 
       {title && (
-        <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-200">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+        <div className="px-4 py-2.5 bg-[var(--sh-s)] border-b border-[var(--sh-b)]">
+          <h3 className="text-sm font-medium text-[var(--sh-ts)]">{title}</h3>
         </div>
       )}
 
       <div style={contentStyle}>
         {children ?? (
           <div className="flex items-center justify-center w-full py-10">
-            <p className="text-sm text-gray-400">Drop components here</p>
+            <p className="text-sm text-[var(--sh-td)]">Drop components here</p>
           </div>
         )}
       </div>

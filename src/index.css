@@ -111,3 +111,48 @@ code {
 }
 @import "tailwindcss";
 
+:root {
+  --sh:      #0d0d10;
+  --sh-s:    #15151b;
+  --sh-b:    rgba(255,255,255,0.07);
+  --sh-b2:   rgba(255,255,255,0.12);
+  --sh-t:    #84849a;
+  --sh-ts:   #e0e0ee;
+  --sh-td:   #4a4a5e;
+
+  --cv:      #f4f4f7;
+  --cv-b:    #e0e0e8;
+
+  --ac:      #3b82f6;
+  --ac-bg:   rgba(59,130,246,0.10);
+  --ac-t:    #93c5fd;
+
+  --ok:      #10b981;
+  --ok-bg:   rgba(16,185,129,0.10);
+  --err:     #ef4444;
+  --err-bg:  rgba(239,68,68,0.10);
+}
+
+.scrollbar-shell {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a38 transparent;
+}
+.scrollbar-shell::-webkit-scrollbar        { width: 4px; }
+.scrollbar-shell::-webkit-scrollbar-track  { background: transparent; }
+.scrollbar-shell::-webkit-scrollbar-thumb  { background: #2a2a38; border-radius: 4px; }
+
+.canvas-grid {
+  background-image: radial-gradient(circle, #c8c8d4 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(4px) scale(0.97); }
+}
+.toast-in  { animation: toast-in  0.18s ease-out both; }
+.toast-out { animation: toast-out 0.14s ease-in  both; }

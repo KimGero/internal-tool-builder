@@ -218,7 +218,7 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
     <div ref={containerRef} className="relative flex flex-col gap-1.5">
 
       {label && (
-        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <label className="text-sm font-medium text-[var(--sh-ts)]">{label}</label>
       )}
 
       {/* Trigger */}
@@ -230,13 +230,13 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
         onClick={() => setOpen(o => !o)}
         className={clsx(
           'flex w-full items-center gap-2 rounded-md border px-3 py-2 text-sm text-left',
-          'bg-white shadow-sm transition-colors',
+          'bg-[var(--sh)] shadow-sm transition-colors',
           'focus:outline-none focus:ring-2 focus:ring-blue-500/20',
           open ? 'border-blue-500' : 'border-gray-300 hover:border-gray-400',
-          !displayValue && 'text-gray-400',
+          !displayValue && 'text-[var(--sh-td)]',
         )}
       >
-        <Calendar className="h-4 w-4 shrink-0 text-gray-400" aria-hidden />
+        <Calendar className="h-4 w-4 shrink-0 text-[var(--sh-td)]" aria-hidden />
         <span className="flex-1">{displayValue || placeholder}</span>
         {clearable && displayValue && (
           <span
@@ -245,7 +245,7 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
             aria-label="Clear date"
             onClick={clearDate}
             onKeyDown={e => e.key === 'Enter' && clearDate(e as unknown as React.MouseEvent)}
-            className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="rounded p-0.5 text-[var(--sh-td)] hover:bg-[var(--sh-b2)] hover:text-[var(--sh-t)]"
           >
             <X className="h-3.5 w-3.5" />
           </span>
@@ -257,41 +257,41 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
         <div
           role="dialog"
           aria-label="Date picker calendar"
-          className="absolute left-0 top-full z-50 mt-1.5 w-72 rounded-lg border border-gray-200 bg-white shadow-lg"
+          className="absolute left-0 top-full z-50 mt-1.5 w-72 rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] shadow-lg"
         >
-          {/* Month navigation */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+          /* Month navigation */
+          <div className="flex items-center justify-between border-b border-[var(--sh-b)] px-4 py-3">
             <button
               type="button"
               aria-label="Previous month"
               onClick={goToPrevMonth}
-              className="rounded p-1.5 text-gray-500 transition-colors hover:bg-gray-100"
+              className="rounded p-1.5 text-[var(--sh-t)] transition-colors hover:bg-[var(--sh-b2)]"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-sm font-semibold text-[var(--sh-ts)]">
               {MONTH_NAMES[viewMonth]} {viewYear}
             </span>
             <button
               type="button"
               aria-label="Next month"
               onClick={goToNextMonth}
-              className="rounded p-1.5 text-gray-500 transition-colors hover:bg-gray-100"
+              className="rounded p-1.5 text-[var(--sh-t)] transition-colors hover:bg-[var(--sh-b2)]"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Day-of-week headers */}
+          /* Day-of-week headers */
           <div className="grid grid-cols-7 px-3 pb-1 pt-3">
             {dayHeaders.map(h => (
-              <div key={h} className="pb-1 text-center text-xs font-medium text-gray-400">
+              <div key={h} className="pb-1 text-center text-xs font-medium text-[var(--sh-td)]">
                 {h}
               </div>
             ))}
           </div>
 
-          {/* Day grid */}
+          /* Day grid */
           <div className="grid grid-cols-7 gap-y-0.5 px-3 pb-3">
             {grid.map((day, i) => {
               const disabled   = isOutOfRange(day.date)
@@ -316,8 +316,8 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
                       : day.isToday && !isMuted
                       ? 'border border-blue-300 font-semibold text-blue-700 hover:bg-blue-50'
                       : isMuted
-                      ? 'text-gray-300 hover:bg-gray-50'
-                      : 'text-gray-700 hover:bg-gray-100',
+                      ? 'text-gray-300 hover:bg-[var(--sh-s)]'
+                      : 'text-[var(--sh-ts)] hover:bg-[var(--sh-b2)]',
                   )}
                 >
                   {day.date.getDate()}
@@ -326,8 +326,8 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
             })}
           </div>
 
-          {/* Today shortcut */}
-          <div className="border-t border-gray-100 px-3 py-2">
+          /* Today shortcut */
+          <div className="border-t border-[var(--sh-b)] px-3 py-2">
             <button
               type="button"
               aria-label="Go to today"

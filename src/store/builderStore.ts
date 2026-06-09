@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { App, AppComponent, DataSource } from '../types'
+import type { ToastMessage } from '../components/ui/Toast'
 
 const MAX_UNDO = 50
 
@@ -29,6 +30,11 @@ interface BuilderStore {
   undo:      () => void
   redo:      () => void
   markClean: () => void
+
+  // Toast actions
+  toasts:      ToastMessage[]
+  addToast:    (message: string, type: ToastMessage['type']) => void
+  removeToast: (id: string) => void
 }
 
 const emptyApp = (): App => ({
@@ -37,7 +43,7 @@ const emptyApp = (): App => ({
   createdAt: Date.now(), updatedAt: Date.now(),
 })
 
-// FIXED: Push current app to past, then cap at MAX_UNDO
+// Push current app to past, then cap at MAX_UNDO
 function push(past: App[], currentApp: App): App[] {
   return [...past, currentApp].slice(-MAX_UNDO)
 }
@@ -45,8 +51,12 @@ function push(past: App[], currentApp: App): App[] {
 export const useBuilderStore = create<BuilderStore>()(
   persist(
     (set) => ({
-      app: emptyApp(), selectedId: null, isDirty: false,
-      past: [], future: [],
+      app: emptyApp(),
+      selectedId: null,
+      isDirty: false,
+      past: [],
+      future: [],
+      toasts: [],  // Initialize empty toasts array
 
       setName: (name) =>
         set((s) => ({ app: { ...s.app, name, updatedAt: Date.now() }, isDirty: true })),
@@ -170,10 +180,21 @@ export const useBuilderStore = create<BuilderStore>()(
         }),
 
       markClean: () => set({ isDirty: false }),
+
+      // Toast actions
+      addToast: (message, type) =>
+        set((s) => ({
+          toasts: [...s.toasts, { id: crypto.randomUUID(), message, type }],
+        })),
+
+      removeToast: (id) =>
+        set((s) => ({
+          toasts: s.toasts.filter((t) => t.id !== id),
+        })),
     }),
     {
       name:       'itb-app',
-      partialize: (s) => ({ app: s.app }),
+      partialize: (s) => ({ app: s.app }), // Don't persist toasts or undo history
     },
   ),
 )

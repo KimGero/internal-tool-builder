@@ -35,7 +35,7 @@ function SortIcon({
   sortDir: SortDir
 }) {
   if (sortKey !== colKey || !sortDir)
-    return <ChevronsUpDown className="w-3 h-3 text-gray-400" aria-hidden />
+    return <ChevronsUpDown className="w-3 h-3 text-[var(--sh-td)]" aria-hidden />
   return sortDir === 'asc'
     ? <ChevronUp   className="w-3 h-3 text-blue-500" aria-hidden />
     : <ChevronDown className="w-3 h-3 text-blue-500" aria-hidden />
@@ -150,13 +150,13 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
 
 
   return (
-    <div className="flex flex-col rounded-lg border border-gray-200 bg-white overflow-hidden">
+    <div className="flex flex-col rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] overflow-hidden">
 
       {/* ── Toolbar ── */}
       {searchable && (
-        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--sh-b)] bg-[var(--sh-s)]/50">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--sh-td)] pointer-events-none" />
             <input
               type="text"
               value={search}
@@ -164,19 +164,19 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
               placeholder="Search..."
               aria-label="Search rows"
               className={clsx(
-                'pl-8 pr-3 py-1.5 text-sm rounded-md border border-gray-200 bg-white',
-                'placeholder:text-gray-400',
+                'pl-8 pr-3 py-1.5 text-sm rounded-md border border-[var(--sh-b)] bg-[var(--sh)]',
+                'placeholder:text-[var(--sh-td)]',
                 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
                 'transition-colors',
               )}
             />
           </div>
           {selectable && selected.size > 0 && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-[var(--sh-t)]">
               {selected.size} row{selected.size > 1 ? 's' : ''} selected
             </span>
           )}
-          <span className="ml-auto text-xs text-gray-400 tabular-nums">
+          <span className="ml-auto text-xs text-[var(--sh-td)] tabular-nums">
             {filtered.length.toLocaleString()} row{filtered.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -186,7 +186,7 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
       <div className="overflow-x-auto">
         <table className="w-full text-sm" aria-label="Data table">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
+            <tr className="border-b border-[var(--sh-b)] bg-[var(--sh-s)]">
               {selectable && (
                 <th scope="col" className="w-10 px-4 py-3">
                   <input
@@ -206,8 +206,8 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
                   style={col.width ? { width: col.width } : undefined}
                   onClick={() => col.sortable !== false && handleSortClick(col.key)}
                   className={clsx(
-                    'px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
-                    col.sortable !== false && 'cursor-pointer select-none hover:bg-gray-100 transition-colors',
+                    'px-4 py-3 text-left text-xs font-semibold text-[var(--sh-t)] uppercase tracking-wider',
+                    col.sortable !== false && 'cursor-pointer select-none hover:bg-[var(--sh-b2)] transition-colors',
                   )}
                 >
                   <span className="inline-flex items-center gap-1.5">
@@ -226,7 +226,7 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
               <tr>
                 <td
                   colSpan={visibleCols.length + (selectable ? 1 : 0)}
-                  className="px-4 py-10 text-center text-sm text-gray-400"
+                  className="px-4 py-10 text-center text-sm text-[var(--sh-td)]"
                 >
                   {search ? `No results for "${search}"` : 'No data to display.'}
                 </td>
@@ -244,7 +244,7 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
                     }}
                     className={clsx(
                       'transition-colors',
-                      isSelected ? 'bg-blue-50' : 'hover:bg-gray-50/70',
+                      isSelected ? 'bg-blue-50' : 'hover:bg-[var(--sh-s)]/70',
                       selectable && 'cursor-pointer',
                     )}
                   >
@@ -261,7 +261,7 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
                       </td>
                     )}
                     {visibleCols.map(col => (
-                      <td key={col.key} className="px-4 py-3 text-gray-700">
+                      <td key={col.key} className="px-4 py-3 text-[var(--sh-ts)]">
                         {renderCell(row, col)}
                       </td>
                     ))}
@@ -275,7 +275,7 @@ export function TableWidget({ component, data: canvasData, runtime, onEvent }: W
 
       {/* ── Pagination ── */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50/50 text-sm text-gray-500">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--sh-b)] bg-[var(--sh-s)]/50 text-sm text-[var(--sh-t)]">
           <span className="tabular-nums">
             {startIdx + 1}–{Math.min(startIdx + rowsPerPage, sorted.length)} of {sorted.length.toLocaleString()}
           </span>

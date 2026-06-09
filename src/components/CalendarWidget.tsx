@@ -17,7 +17,7 @@ const EVENT_COLORS: Record<string, string> = {
   yellow: 'bg-yellow-100 text-yellow-800',
   purple: 'bg-purple-100 text-purple-800',
   orange: 'bg-orange-100 text-orange-800',
-  gray:   'bg-gray-100 text-gray-600',
+  gray:   'bg-gray-100 text-[var(--sh-t)]',
 }
 
 interface CalEvent {
@@ -100,41 +100,41 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
   const next = () => setViewDate(new Date(year, month + 1, 1))
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden select-none">
+    <div className="rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] overflow-hidden select-none">
 
-      {/* Month navigation */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+      /* Month navigation */
+      <div className="flex items-center justify-between px-4 py-3 bg-[var(--sh-s)] border-b border-[var(--sh-b)]">
         <button
           aria-label="Previous month"
           onClick={prev}
-          className="p-1.5 rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-colors"
+          className="p-1.5 rounded text-[var(--sh-t)] hover:bg-gray-200 hover:text-[var(--sh-ts)] transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
 
-        <h3 className="text-sm font-semibold text-gray-900">
+        <h3 className="text-sm font-semibold text-[var(--sh-ts)]">
           {MONTH_NAMES[month]} {year}
         </h3>
 
         <button
           aria-label="Next month"
           onClick={next}
-          className="p-1.5 rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-colors"
+          className="p-1.5 rounded text-[var(--sh-t)] hover:bg-gray-200 hover:text-[var(--sh-ts)] transition-colors"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Weekday headers */}
-      <div className="grid grid-cols-7 border-b border-gray-200">
+      /* Weekday headers */
+      <div className="grid grid-cols-7 border-b border-[var(--sh-b)]">
         {DAY_LABELS.map(label => (
-          <div key={label} className="py-2 text-center text-xs font-medium text-gray-400 uppercase tracking-wide">
+          <div key={label} className="py-2 text-center text-xs font-medium text-[var(--sh-td)] uppercase tracking-wide">
             {label}
           </div>
         ))}
       </div>
 
-      {/* Day cells */}
+      /* Day cells */
       <div className="grid grid-cols-7">
         {grid.map((day, idx) => {
           const key         = toDateKey(day)
@@ -148,18 +148,18 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
               key={idx}
               onClick={() => onEvent('dayClick', { date: key, events: dayEvents })}
               className={clsx(
-                'min-h-[88px] p-1.5 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50',
-                !isLastCol && 'border-r border-gray-100',
-                !isThisMonth && 'bg-gray-50/50',
+                'min-h-[88px] p-1.5 border-b border-[var(--sh-b)] cursor-pointer transition-colors hover:bg-[var(--sh-s)]',
+                !isLastCol && 'border-r border-[var(--sh-b)]',
+                !isThisMonth && 'bg-[var(--sh-s)]/50',
               )}
             >
-              {/* Day number */}
+              /* Day number */
               <div className="flex justify-end mb-1">
                 <span className={clsx(
                   'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs',
                   isToday
                     ? 'bg-blue-600 text-white font-semibold'
-                    : isThisMonth ? 'text-gray-900' : 'text-gray-400',
+                    : isThisMonth ? 'text-[var(--sh-ts)]' : 'text-[var(--sh-td)]',
                 )}>
                   {day.getDate()}
                 </span>
@@ -180,7 +180,7 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
                   </button>
                 ))}
                 {dayEvents.length > 3 && (
-                  <p className="text-xs text-gray-400 px-1.5">+{dayEvents.length - 3} more</p>
+                  <p className="text-xs text-[var(--sh-td)] px-1.5">+{dayEvents.length - 3} more</p>
                 )}
               </div>
             </div>
