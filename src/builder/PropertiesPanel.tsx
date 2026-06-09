@@ -217,7 +217,7 @@ export function PropertiesPanel() {
       className="w-64 shrink-0 flex flex-col bg-[var(--sh)] border-l border-[var(--sh-b)]
         h-full overflow-y-auto"
     >
-      /* Header */
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--sh-b)]
         bg-[var(--sh-s)] shrink-0">
         <div className="min-w-0">
@@ -257,7 +257,6 @@ export function PropertiesPanel() {
         ))}
       </Section>
 
-      /* Events Section (shown when component has events) */
       {eventEntries.length > 0 && (
         <Section title="Events" defaultOpen={false} badge={filledEvents}>
           <p className="text-xs text-[var(--sh-td)] mb-3 leading-relaxed">

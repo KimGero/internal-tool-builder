@@ -102,7 +102,7 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
   return (
     <div className="rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] overflow-hidden select-none">
 
-      /* Month navigation */
+      {/* Month navigation */}
       <div className="flex items-center justify-between px-4 py-3 bg-[var(--sh-s)] border-b border-[var(--sh-b)]">
         <button
           aria-label="Previous month"
@@ -125,7 +125,7 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
         </button>
       </div>
 
-      /* Weekday headers */
+      {/* Weekday headers */}
       <div className="grid grid-cols-7 border-b border-[var(--sh-b)]">
         {DAY_LABELS.map(label => (
           <div key={label} className="py-2 text-center text-xs font-medium text-[var(--sh-td)] uppercase tracking-wide">
@@ -134,7 +134,7 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
         ))}
       </div>
 
-      /* Day cells */
+      {/* Day cells */}
       <div className="grid grid-cols-7">
         {grid.map((day, idx) => {
           const key         = toDateKey(day)
@@ -153,7 +153,7 @@ export function CalendarWidget({ component, onEvent, data = [] }: WidgetProps) {
                 !isThisMonth && 'bg-[var(--sh-s)]/50',
               )}
             >
-              /* Day number */
+              {/* Day number */}
               <div className="flex justify-end mb-1">
                 <span className={clsx(
                   'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs',

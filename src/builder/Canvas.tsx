@@ -69,14 +69,12 @@ function SortableWidget({ id, component, isSelected, previewMode, onSelect, onDe
         !previewMode && isSelected && 'ring-2 ring-[var(--ac)]/70 ring-offset-2 ring-offset-[var(--cv)]',
       )}
     >
-      /* Floating Toolbar - visible in design mode only */
       {!previewMode && (
         <div className={clsx(
           'absolute -top-3 right-2 z-10 flex items-center transition-opacity',
           'opacity-0 group-hover:opacity-100',
           isSelected && 'opacity-100',
         )}>
-          /* Drag Handle */
           <span
             {...attributes}
             {...listeners}

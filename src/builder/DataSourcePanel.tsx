@@ -105,7 +105,6 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         />
       </div>
 
-      /* Type */
       <div>
         <label className={labelClass}>Type</label>
         <select
@@ -191,7 +190,6 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         </div>
       )}
 
-      /* Cache TTL */
       <div>
         <label className={labelClass}>Cache TTL <span className="text-[var(--sh-td)]">(ms)</span></label>
         <input
@@ -205,7 +203,6 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         />
       </div>
 
-      /* Save / Cancel */
       <div className="flex gap-2">
         <button
           aria-label="Save data source"
@@ -224,7 +221,6 @@ function SourceForm({ editing, onChange, onSave, onCancel, onTest, testing, test
         </button>
       </div>
 
-      /* Test */
       <button
         aria-label="Test data source"
         onClick={onTest}
