@@ -198,7 +198,7 @@ export function KanbanWidget({ component, data: canvasData, runtime, onEvent }: 
               onDragOver={e => e.preventDefault()}
               onDrop={e => handleDrop(e, column.id)}
             >
-              /* Column header */
+              {/* Column header */}
               <div className={clsx(
                 'flex items-center justify-between rounded-t-lg px-4 py-3',
                 colors.header,

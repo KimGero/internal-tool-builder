@@ -125,11 +125,11 @@ describe('EventBus', () => {
     it('a once-listener removing itself does not skip following listeners', () => {
       const order: number[] = []
       bus.on('e', () => order.push(1))
-      bus.once('e', () => order.push(2)) // removes itself on first emit
+      bus.once('e', () => order.push(2)) 
       bus.on('e', () => order.push(3))
 
-      bus.emit('e') // → [1, 2, 3]
-      bus.emit('e') // once is gone → [1, 2, 3, 1, 3]
+      bus.emit('e') 
+      bus.emit('e') 
 
       expect(order).toEqual([1, 2, 3, 1, 3])
     })

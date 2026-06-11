@@ -281,7 +281,7 @@ export default function App() {
               <DataSourcePanel />
             </main>
           ) : (
-            <main className="flex-1 overflow-hidden">
+            <main className="flex-1 overflow-hidden flex flex-col">
               <Canvas previewMode={isPreviewMode} />
             </main>
           )}

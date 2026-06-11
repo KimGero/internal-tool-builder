@@ -259,7 +259,7 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
           aria-label="Date picker calendar"
           className="absolute left-0 top-full z-50 mt-1.5 w-72 rounded-lg border border-[var(--sh-b)] bg-[var(--sh)] shadow-lg"
         >
-          /* Month navigation */
+          {/* Month navigation */}
           <div className="flex items-center justify-between border-b border-[var(--sh-b)] px-4 py-3">
             <button
               type="button"
@@ -282,7 +282,7 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
             </button>
           </div>
 
-          /* Day-of-week headers */
+          {/* Day-of-week headers */}
           <div className="grid grid-cols-7 px-3 pb-1 pt-3">
             {dayHeaders.map(h => (
               <div key={h} className="pb-1 text-center text-xs font-medium text-[var(--sh-td)]">
@@ -291,7 +291,7 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
             ))}
           </div>
 
-          /* Day grid */
+          {/* Day grid */}
           <div className="grid grid-cols-7 gap-y-0.5 px-3 pb-3">
             {grid.map((day, i) => {
               const disabled   = isOutOfRange(day.date)
@@ -326,7 +326,7 @@ export function DatePickerWidget({ component, runtime, onEvent }: WidgetProps) {
             })}
           </div>
 
-          /* Today shortcut */
+          {/* Today shortcut */}
           <div className="border-t border-[var(--sh-b)] px-3 py-2">
             <button
               type="button"

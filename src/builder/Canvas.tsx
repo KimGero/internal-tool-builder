@@ -225,8 +225,7 @@ export function Canvas({ previewMode = false }: { previewMode?: boolean }) {
   return (
     <main 
       data-preview={previewMode} 
-      className="flex-1 min-h-0 overflow-y-auto p-8 transition-colors canvas-grid scrollbar-shell bg-[var(--cv)]"
-    >
+        className="flex-1 min-h-0 overflow-y-auto p-8 transition-colors canvas-grid scrollbar-shell bg-[var(--cv)]"    >
       <CanvasContent previewMode={previewMode} />
     </main>
   )

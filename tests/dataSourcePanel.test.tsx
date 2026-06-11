@@ -22,7 +22,7 @@ vi.mock('../src/store/builderStore', () => ({
   useBuilderStore: (sel: (s: Record<string, unknown>) => unknown) => sel(getState()),
 }))
 
-// Mock the dataSourceManager with the hoisted mockExecute
+// Mock the dataSourceManager with mockExecute
 vi.mock('../src/services/dataSourceManager', () => ({
   dataSourceManager: { 
     execute: (...args: any[]) => mockExecute(...args),

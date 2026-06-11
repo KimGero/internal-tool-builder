@@ -66,7 +66,7 @@ function Toast({ toast }: { toast: ToastMessage }) {
 }
 
 export function ToastContainer() {
-  const toasts = useBuilderStore(s => s.toasts) || []  // Add fallback
+  const toasts = useBuilderStore(s => s.toasts) || []  
   if (toasts.length === 0) return null
   return (
     <div

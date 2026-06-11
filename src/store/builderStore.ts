@@ -56,7 +56,7 @@ export const useBuilderStore = create<BuilderStore>()(
       isDirty: false,
       past: [],
       future: [],
-      toasts: [],  // Initialize empty toasts array
+      toasts: [],  
 
       setName: (name) =>
         set((s) => ({ app: { ...s.app, name, updatedAt: Date.now() }, isDirty: true })),
@@ -194,7 +194,7 @@ export const useBuilderStore = create<BuilderStore>()(
     }),
     {
       name:       'itb-app',
-      partialize: (s) => ({ app: s.app }), // Don't persist toasts or undo history
+      partialize: (s) => ({ app: s.app }), 
     },
   ),
 )
